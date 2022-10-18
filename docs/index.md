@@ -9,7 +9,7 @@ permalink: /
 # seatool-connectors
 {: .fs-9 }
 
-The seatool-connectors project is a microservice compares legacy data and seatool data and sends notifications when certain conditions
+The seatool-connectors project streams CMS SEA Tool data to CMS Bigmac.
 {: .fs-6 .fw-300 }
 
 [Join us on Slack](https://cmsgov.slack.com/archives/C047RBDL396){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [View it on GitHub](https://github.com/cmsgov/seatool-connectors){: .btn .fs-5 .mb-4 .mb-md-0 }
