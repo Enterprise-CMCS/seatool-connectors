@@ -4,5 +4,7 @@
   "description": "Creates mmdl topics in CMS Bigmac.",
   "author": "",
   "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
 }
