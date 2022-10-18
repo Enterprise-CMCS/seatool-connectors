@@ -18,7 +18,7 @@ The seatool-connectors project is a microservice compares legacy data and seatoo
 
 ## Welcome!
 
-The seatool-connectors project is a microservice compares legacy data and seatool data and sends notifications when certain conditions 
+The seatool-connectors project is a microservice that sends CMS SEA Tool data to CMS Bigmac.
 
 This project is under active development by the MACPRO Platform team.  Read on for more details, and feel free to join us on [Slack](https://cmsgov.slack.com/archives/C047RBDL396).
 

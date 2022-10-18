@@ -29,7 +29,7 @@
 
 ## Overview
 
-The seatool-connectors project (oftened referenced in the context of this repository as just 'compare') is a microservice compares legacy data and seatool data and sends notifications when certain conditions exist.
+The seatool-connectors project (oftened referenced in the context of this repository as just 'seatool') is a microservice that sends CMS Sea Tool data to CMS Bigmac.
 
 ![Architecture Diagram](docs/assets/architecture.svg)
 

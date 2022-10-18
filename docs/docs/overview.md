@@ -22,7 +22,7 @@ View this site's [\_config.yml](https://github.com/cmsgov/seatool-connectors/tre
 
 ## Overview
 
-The seatool-connectors project is a microservice compares legacy data and seatool data and sends notifications when certain conditions. Alerting is leveraged through [AWS Cloudwatch](https://aws.amazon.com/cloudwatch/).
+The seatool-connectors project is a microservice that sends CMS SEA Tool data to CMS Bigmac. Alerting is leveraged through [AWS Cloudwatch](https://aws.amazon.com/cloudwatch/).
 
 ## Archtecture
 
