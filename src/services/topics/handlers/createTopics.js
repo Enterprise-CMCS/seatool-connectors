@@ -62,13 +62,15 @@ exports.handler = async function (event, context, callback) {
 
   // Generate the complete topic list from the condensed version above.
   for (var element of condensedTopicList) {
-    topicList.push(..._.map(element.topics, (topic) => {
-      return {
-        topic: `${element.topicPrefix}${topic}`,
-        numPartitions: element.numPartitions,
-        replicationFactor: element.replicationFactor,
-      };
-    }));
+    topicList.push(
+      ..._.map(element.topics, (topic) => {
+        return {
+          topic: `${element.topicPrefix}${topic}`,
+          numPartitions: element.numPartitions,
+          replicationFactor: element.replicationFactor,
+        };
+      })
+    );
   }
 
   await topics.createTopics(
