@@ -18,11 +18,11 @@ The 10,000ft view
 
 ---
 
-View this site's [\_config.yml](https://github.com/cmsgov/seatool-compare/tree/main/_config.yml) file as an example.
+View this site's [\_config.yml](https://github.com/cmsgov/seatool-connectors/tree/main/_config.yml) file as an example.
 
 ## Overview
 
-The seatool-compare project is a microservice compares legacy data and seatool data and sends notifications when certain conditions. Alerting is leveraged through [AWS Cloudwatch](https://aws.amazon.com/cloudwatch/).
+The seatool-connectors project is a microservice compares legacy data and seatool data and sends notifications when certain conditions. Alerting is leveraged through [AWS Cloudwatch](https://aws.amazon.com/cloudwatch/).
 
 ## Archtecture
 

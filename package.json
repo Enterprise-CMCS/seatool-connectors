@@ -1,5 +1,5 @@
 {
-  "name": "seatool-compare",
+  "name": "seatool-connectors",
   "type": "module",
   "description": "Service for comparing legacy/seatool data and sending notifications",
   "version": "0.0.0-managed-by-semantic-release",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cmsgov/seatool-compare"
+    "url": "https://github.com/cmsgov/seatool-connectors"
   },
   "author": "",
   "license": "CC0-1.0",
   "bugs": {
-    "url": "https://github.com/CMSgov/seatool-compare/issues"
+    "url": "https://github.com/CMSgov/seatool-connectors/issues"
   },
-  "homepage": "https://github.com/CMSgov/seatool-compare#readme",
+  "homepage": "https://github.com/CMSgov/seatool-connectors#readme",
   "devDependencies": {
     "@serverless/compose": "^1.3.0",
     "@stratiformdigital/security-hub-sync": "^1.0.3",
