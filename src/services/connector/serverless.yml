@@ -198,17 +198,14 @@ resources:
               - Name: CONNECT_BOOTSTRAP_SERVERS
                 Value: >-
                   ${self:custom.brokerString}
-              # ---- These values have a hardcoded 'seatool' where ${self:service} should be. ----
-              # ---- This is to accomdate existing mgmt topic names and existing group ids    ----
               - Name: CONNECT_GROUP_ID
-                Value: ${param:topicNamespace}mgmt.connect.seatool-${sls:stage}
+                Value: ${param:topicNamespace}mgmt.connect.${self:service}-${sls:stage}
               - Name: CONNECT_CONFIG_STORAGE_TOPIC
-                Value: ${param:topicNamespace}mgmt.connect.seatool-${sls:stage}.config
+                Value: ${param:topicNamespace}mgmt.connect.${self:service}-${sls:stage}.config
               - Name: CONNECT_OFFSET_STORAGE_TOPIC
-                Value: ${param:topicNamespace}mgmt.connect.seatool-${sls:stage}.offsets
+                Value: ${param:topicNamespace}mgmt.connect.${self:service}-${sls:stage}.offsets
               - Name: CONNECT_STATUS_STORAGE_TOPIC
-                Value: ${param:topicNamespace}mgmt.connect.seatool-${sls:stage}.status
-              # ----------------------------------------------------------------------------------
+                Value: ${param:topicNamespace}mgmt.connect.${self:service}-${sls:stage}.status
               - Name: CONNECT_OFFSET_STORAGE_PARTITIONS
                 Value: 5
               - Name: CONNECT_STATUS_STORAGE_PARTITIONS
