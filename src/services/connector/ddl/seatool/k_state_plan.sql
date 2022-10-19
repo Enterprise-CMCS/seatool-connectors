@@ -1,7 +1,7 @@
 SET 'auto.offset.reset' = 'earliest';
 
 CREATE TABLE IF NOT EXISTS K_SEATool_agg_State_Plan
-  WITH (KAFKA_TOPIC='aws.ksqldb.seatool.agg.State_Plan',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.ksqldb.seatool.agg.State_Plan',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
     SELECT sp.ID_Number as ID_Number,
       STRUCT(
         State_Plan := sp.StatePlan,
@@ -70,56 +70,56 @@ CREATE TABLE IF NOT EXISTS K_SEATool_agg_State_Plan
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_SEATool_agg_StatePlan_1115
-  WITH (KAFKA_TOPIC = 'aws.ksqldb.seatool.agg.StatePlan_1115',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC = '${param:topicNamespace}aws.ksqldb.seatool.agg.StatePlan_1115',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT * 
     FROM K_SEATool_agg_State_Plan
    WHERE sp->state_plan->plan_type = 121
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_SEATool_agg_StatePlan_1915b_waivers
-  WITH (KAFKA_TOPIC = 'aws.ksqldb.seatool.agg.StatePlan_1915b_waivers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC = '${param:topicNamespace}aws.ksqldb.seatool.agg.StatePlan_1915b_waivers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT * 
     FROM K_SEATool_agg_State_Plan
    WHERE sp->state_plan->plan_type = 122
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_SEATool_agg_StatePlan_1915c_waivers
-  WITH (KAFKA_TOPIC = 'aws.ksqldb.seatool.agg.StatePlan_1915c_waivers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC = '${param:topicNamespace}aws.ksqldb.seatool.agg.StatePlan_1915c_waivers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT * 
     FROM K_SEATool_agg_State_Plan
    WHERE sp->state_plan->plan_type = 123
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_SEATool_agg_StatePlan_CHIP_SPA
-  WITH (KAFKA_TOPIC = 'aws.ksqldb.seatool.agg.StatePlan_CHIP_SPA',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC = '${param:topicNamespace}aws.ksqldb.seatool.agg.StatePlan_CHIP_SPA',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT * 
     FROM K_SEATool_agg_State_Plan
    WHERE sp->state_plan->plan_type = 124
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_SEATool_agg_StatePlan_Medicaid_SPA
-  WITH (KAFKA_TOPIC = 'aws.ksqldb.seatool.agg.StatePlan_Medicaid_SPA',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC = '${param:topicNamespace}aws.ksqldb.seatool.agg.StatePlan_Medicaid_SPA',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT * 
     FROM K_SEATool_agg_State_Plan sp
    WHERE sp->state_plan->plan_type = 125
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_SEATool_agg_StatePlan_1115_Indep_Plus
-  WITH (KAFKA_TOPIC = 'aws.ksqldb.seatool.agg.StatePlan_1115_Indep_Plus',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC = '${param:topicNamespace}aws.ksqldb.seatool.agg.StatePlan_1115_Indep_Plus',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT * 
     FROM K_SEATool_agg_State_Plan
    WHERE sp->state_plan->plan_type = 126
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_SEATool_agg_StatePlan_1915c_Indep_Plus
-  WITH (KAFKA_TOPIC = 'aws.ksqldb.seatool.agg.StatePlan_1915c_Indep_Plus',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC = '${param:topicNamespace}aws.ksqldb.seatool.agg.StatePlan_1915c_Indep_Plus',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT * 
     FROM K_SEATool_agg_State_Plan
    WHERE sp->state_plan->plan_type = 127
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_SEATool_agg_StatePlan_UPL
-  WITH (KAFKA_TOPIC = 'aws.ksqldb.seatool.agg.StatePlan_UPL',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC = '${param:topicNamespace}aws.ksqldb.seatool.agg.StatePlan_UPL',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT * 
     FROM K_SEATool_agg_State_Plan
    WHERE sp->state_plan->plan_type = 130
