@@ -18,8 +18,6 @@ The 10,000ft view
 
 ---
 
-View this site's [\_config.yml](https://github.com/cmsgov/seatool-connectors/tree/main/_config.yml) file as an example.
-
 ## Overview
 
 The seatool-connectors project is a microservice that sends CMS SEA Tool data to CMS Bigmac. Alerting is leveraged through [AWS Cloudwatch](https://aws.amazon.com/cloudwatch/).
