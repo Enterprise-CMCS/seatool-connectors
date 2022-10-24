@@ -346,8 +346,8 @@ resources:
         TaskRoleArn: !GetAtt ksqldbHeadlessRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: 4GB
-        Cpu: "${param:cpu}"
+        Memory: 4096
+        Cpu: 2048
         EphemeralStorage: 50
     ksqldbIntService:
       Type: "AWS::ECS::Service"
