@@ -1,15 +1,15 @@
 services:
-  alerts:
-    path: src/services/alerts
+  # alerts:
+  #   path: src/services/alerts
   topics:
     path: src/services/topics
-  connector:
-    path: src/services/connector
-    params:
-      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
-    dependsOn: topics
-  ksqldb:
-    path: src/services/ksqldb
-    params:
-      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
-    dependsOn: topics
+  # connector:
+  #   path: src/services/connector
+  #   params:
+  #     ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+  #   dependsOn: topics
+  # ksqldb:
+  #   path: src/services/ksqldb
+  #   params:
+  #     ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+  #   dependsOn: topics
