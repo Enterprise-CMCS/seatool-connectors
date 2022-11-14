@@ -6,11 +6,12 @@ nav_order: 1
 ---
 
 # alerts
+
 {: .no_toc }
 
 #### Summary
 
-The alerts service deploys a Simple Notification Service (SNS) topic to REGION_A.  This topic can be leveraged by any other service for sending alerts.
+The alerts service deploys a Simple Notification Service (SNS) topic to REGION_A. This topic can be leveraged by any other service for sending alerts.
 
 #### Notes
 

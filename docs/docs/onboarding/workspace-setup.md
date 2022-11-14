@@ -6,20 +6,24 @@ nav_order: 4
 ---
 
 # Workspace Setup
+
 {: .no_toc }
 
 Before you begin development, it's important to configure your workstation properly. This section will give you an overview of what tools are installed and get you bootstrapped.
 {: .fs-6 .fw-300 }
 
 ## Table of contents
+
 {: .no_toc .text-delta }
 
 1. TOC
-{:toc}
+   {:toc}
+
 ---
 
 ## Development Tool list
-This is a static list of tools that should be pre-installed to support all development workflows. Please understand that the installation of most of these tools is automated, which will be discussed in the next section.  This serves as a general overview of what will be installed.
+
+This is a static list of tools that should be pre-installed to support all development workflows. Please understand that the installation of most of these tools is automated, which will be discussed in the next section. This serves as a general overview of what will be installed.
 
 | Tool                                                                              | Version   | Required |
 | --------------------------------------------------------------------------------- | --------- | -------- |
@@ -37,7 +41,6 @@ This is a static list of tools that should be pre-installed to support all devel
 | [Git](https://git-scm.com/)                                                       | 2.x       | Yes      |
 
 [ssmpluginlink]: https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html
-
 
 ## Install Rosetta 2 (Apple Silicon only)
 
@@ -85,4 +88,4 @@ This step requires that your request for AWS access has been completed. If it ha
 
 Nice job! If you've successfully stepped through this document, you should be entirely ready to start active development on the seatool-connectors project.
 
-If you've had errors along the way, that's OK! We're here to help. If you've successfully joined our Slack channel, feel free to post there.  Else, please send an email to mdial@collabralink.com explaining the issue. We will get back to you ASAP.
+If you've had errors along the way, that's OK! We're here to help. If you've successfully joined our Slack channel, feel free to post there. Else, please send an email to mdial@collabralink.com explaining the issue. We will get back to you ASAP.
