@@ -399,7 +399,7 @@ resources:
         MetricName: ConnectorLogsWarnCount
         Namespace: ${self:service}-${sls:stage}/Connector/WARNS
         Statistic: Sum
-
+ 
   Outputs:
     KafkaConnectWorkerSecurityGroupId:
       Description: |
