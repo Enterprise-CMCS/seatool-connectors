@@ -25,3 +25,8 @@ The seatool-connectors project is a microservice that sends CMS SEA Tool data to
 ## Archtecture
 
 ![Architecture Diagram](../../../assets/architecture.svg)
+
+
+## View Metrics
+
+[Metrics](https://cmsgov.github.io/seatool-connectors/dora/)
