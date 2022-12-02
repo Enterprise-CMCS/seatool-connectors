@@ -162,6 +162,12 @@ resources:
                   - "ecs.amazonaws.com"
                   - "ecs-tasks.amazonaws.com"
               Action: "sts:AssumeRole"
+            - Effect: "Allow"
+              Principal:
+                Service:
+                  - "ecs.amazonaws.com"
+                  - "ecs-tasks.amazonaws.com"
+              Action: "sts:AssumeRole"
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
         Policies:
@@ -176,12 +182,19 @@ resources:
                     - ssmmessages:OpenControlChannel
                     - ssmmessages:OpenDataChannel
                   Resource: "*"
+                - Effect: Allow
+                  Action:
+                    - ecr:*
+                    # - ecr:CreateRepository
+                    # - ecr:BatchImportUpstreamImage
+                    # - ecr:CreatePullThroughCacheRule
+                  Resource: "*"
     KafkaConnectWorkerTaskDefinition:
       Type: "AWS::ECS::TaskDefinition"
       Properties:
         ContainerDefinitions:
           - Name: connect
-            Image: "confluentinc/cp-kafka-connect:6.0.9"
+            Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecr-public/ews-network/confluentinc/cp-kafka-connect:6.1.1"
             Memory: 4096
             Cpu: 2048
             Command:
