@@ -185,16 +185,13 @@ resources:
                 - Effect: Allow
                   Action:
                     - ecr:*
-                    # - ecr:CreateRepository
-                    # - ecr:BatchImportUpstreamImage
-                    # - ecr:CreatePullThroughCacheRule
                   Resource: "*"
     KafkaConnectWorkerTaskDefinition:
       Type: "AWS::ECS::TaskDefinition"
       Properties:
         ContainerDefinitions:
           - Name: connect
-            Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecr-public/ews-network/confluentinc/cp-kafka-connect:6.1.1"
+            Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/confluentinc/cp-kafka-connect:6.0.9"
             Memory: 4096
             Cpu: 2048
             Command:
