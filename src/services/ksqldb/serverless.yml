@@ -139,13 +139,17 @@ resources:
                     - ssmmessages:OpenControlChannel
                     - ssmmessages:OpenDataChannel
                   Resource: "*"
+                - Effect: Allow
+                  Action:
+                    - ecr:*
+                  Resource: "*"
 
     ksqldbHeadlessTaskDefinition:
       Type: "AWS::ECS::TaskDefinition"
       Properties:
         ContainerDefinitions:
           - Name: ksqldb-headless
-            Image: "confluentinc/ksqldb-server:0.26.0"
+            Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/confluentinc/ksqldb-server:0.26.0"
             Ulimits:
               - Name: "nofile"
                 HardLimit: 1048576
@@ -297,7 +301,7 @@ resources:
       Properties:
         ContainerDefinitions:
           - Name: ksqldb-interactive
-            Image: "confluentinc/ksqldb-server:0.26.0"
+            Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/confluentinc/ksqldb-server:0.26.0"
             Command:
               - bash
               - "-c"

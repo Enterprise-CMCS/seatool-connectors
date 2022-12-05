@@ -1,7 +1,7 @@
 name: ECR Image
 on:
-  push:
-    branches: ["reggie"]
+  # push:
+  #   branches: ["reggie"]
   workflow_dispatch:
 
 jobs:
