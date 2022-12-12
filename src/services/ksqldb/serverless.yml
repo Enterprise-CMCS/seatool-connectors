@@ -142,8 +142,8 @@ resources:
                   Resource: "*"
                 - Effect: Allow
                   Action:
-                    - ecr:*
-                  Resource: "*"
+                    - ecr:BatchGetImage
+                  Resource: !Sub "arn:aws:ecr:${self:provider.region}:${AWS::AccountId}:repository/*"
 
     ksqldbHeadlessTaskDefinition:
       Type: "AWS::ECS::TaskDefinition"
