@@ -163,12 +163,6 @@ resources:
                   - "ecs.amazonaws.com"
                   - "ecs-tasks.amazonaws.com"
               Action: "sts:AssumeRole"
-            - Effect: "Allow"
-              Principal:
-                Service:
-                  - "ecs.amazonaws.com"
-                  - "ecs-tasks.amazonaws.com"
-              Action: "sts:AssumeRole"
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
         Policies:
