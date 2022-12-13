@@ -31,10 +31,12 @@ resources:
       Type: "AWS::SNS::Topic"
       Properties:
         TopicName: ECSTaskFailure-${self:service}-${sls:stage}
+        KmsMasterKeyId: !Ref KmsKeyForSns
 
     KmsKeyForSns:
       Type: AWS::KMS::Key
       Properties:
+        EnableKeyRotation: "true"
         KeyPolicy:
           Version: "2012-10-17"
           Statement:
