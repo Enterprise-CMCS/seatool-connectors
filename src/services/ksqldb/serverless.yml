@@ -33,6 +33,7 @@ custom:
       - val
       - production
   vpc: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/vpc, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/vpc}
+  ksqldbImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/ksqldb-server:0.26.0"}
   brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
   headlessSqlContents: ${file(./compileDDL.js):ddl}
   scripts:
@@ -139,13 +140,17 @@ resources:
                     - ssmmessages:OpenControlChannel
                     - ssmmessages:OpenDataChannel
                   Resource: "*"
+                - Effect: Allow
+                  Action:
+                    - ecr:BatchGetImage
+                  Resource: !Sub "arn:aws:ecr:${self:provider.region}:${AWS::AccountId}:repository/*"
 
     ksqldbHeadlessTaskDefinition:
       Type: "AWS::ECS::TaskDefinition"
       Properties:
         ContainerDefinitions:
           - Name: ksqldb-headless
-            Image: "confluentinc/ksqldb-server:0.26.0"
+            Image: ${self:custom.ksqldbImage}
             Ulimits:
               - Name: "nofile"
                 HardLimit: 1048576
@@ -297,7 +302,7 @@ resources:
       Properties:
         ContainerDefinitions:
           - Name: ksqldb-interactive
-            Image: "confluentinc/ksqldb-server:0.26.0"
+            Image: ${self:custom.ksqldbImage}
             Command:
               - bash
               - "-c"
