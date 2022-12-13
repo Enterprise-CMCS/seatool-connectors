@@ -32,6 +32,27 @@ resources:
       Properties:
         TopicName: ECSTaskFailure-${self:service}-${sls:stage}
 
+    KmsKeyForSns:
+      Type: AWS::KMS::Key
+      Properties:
+        KeyPolicy:
+          Version: "2012-10-17"
+          Statement:
+            - Sid: Allow access for Root User
+              Effect: Allow
+              Principal:
+                AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/*"
+              Action: "kms:*"
+              Resource: "*"
+            - Sid: Allow access for Key User (SNS Service Principal)
+              Effect: Allow
+              Principal:
+                Service: "sns.amazonaws.com"
+              Action:
+                - "kms:GenerateDataKey"
+                - "kms:Decrypt"
+              Resource: "*"
+
     EventBridgeToToSnsPolicy:
       Type: AWS::SNS::TopicPolicy
       Properties:
