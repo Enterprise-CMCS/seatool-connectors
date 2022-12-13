@@ -43,7 +43,7 @@ resources:
             - Sid: Allow access for Root User
               Effect: Allow
               Principal:
-                AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/*"
+                AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
               Action: "kms:*"
               Resource: "*"
             - Sid: Allow access for Key User (SNS Service Principal)
