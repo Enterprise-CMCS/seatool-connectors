@@ -222,7 +222,7 @@ resources:
                 awslogs-region: !Sub "${AWS::Region}"
                 awslogs-group: !Sub "${ksqldbHeadlessLogGroup}"
                 awslogs-stream-prefix: fargate
-
+                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
         Family: ${self:service}-${sls:stage}-ksqldb-headless
         NetworkMode: awsvpc
         ExecutionRoleArn: !GetAtt ksqldbHeadlessRole.Arn
@@ -311,7 +311,7 @@ resources:
                 echo "int ksqlDB task..." &&
                 cd ~ &&
                 curl -O https://packages.confluent.io/archive/7.0/confluent-community-7.0.0.tar.gz &&
-                tar -xzvf confluent-community-7.0.0.tar.gz && 
+                tar -xzvf confluent-community-7.0.0.tar.gz &&
                 ln -s confluent-community-7.0.0 confluent-community &&
                 /usr/bin/docker/run
             Environment:
@@ -345,6 +345,7 @@ resources:
                 awslogs-region: !Sub "${AWS::Region}"
                 awslogs-group: !Sub "${ksqldbIntLogGroup}"
                 awslogs-stream-prefix: fargate
+                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
         Family: ${self:service}-${sls:stage}-ksqldbInt
         NetworkMode: awsvpc
         ExecutionRoleArn: !GetAtt ksqldbHeadlessRole.Arn
