@@ -56,12 +56,13 @@ custom:
   vpc: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/vpc, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/vpc}
   brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
   dbInfo: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/dbInfo, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/dbInfo}
+  connectImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/cp-kafka-connect:6.0.9"}
   scripts:
     hooks:
       deploy:finalize: |
         set -e
         call=`aws lambda invoke --region ${self:provider.region} --function-name ${self:service}-${sls:stage}-configureConnectors --invocation-type RequestResponse --log Tail /dev/stdout`
-        if ! echo $call | jq '.FunctionError'; then 
+        if ! echo $call | jq '.FunctionError'; then
           echo "The Lambda function did not succeed." && exit 1;
         fi
     commands:
@@ -73,7 +74,7 @@ custom:
           echo """
           To conect to the connector, run:
           aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container connect --interactive --command "/bin/sh"
-            
+
           To connect to the sql instantclient, run:
           aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container instantclient --interactive --command "/bin/sh"
           """
@@ -176,12 +177,16 @@ resources:
                     - ssmmessages:OpenControlChannel
                     - ssmmessages:OpenDataChannel
                   Resource: "*"
+                - Effect: Allow
+                  Action:
+                    - ecr:BatchGetImage
+                  Resource: !Sub "arn:aws:ecr:${self:provider.region}:${AWS::AccountId}:repository/*"
     KafkaConnectWorkerTaskDefinition:
       Type: "AWS::ECS::TaskDefinition"
       Properties:
         ContainerDefinitions:
           - Name: connect
-            Image: "confluentinc/cp-kafka-connect:6.0.9"
+            Image: ${self:custom.connectImage}
             Memory: 4096
             Cpu: 2048
             Command:
@@ -240,6 +245,7 @@ resources:
                 awslogs-region: !Sub "${AWS::Region}"
                 awslogs-group: !Sub "${KafkaConnectWorkerLogGroup}"
                 awslogs-stream-prefix: fargate
+                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
           - Name: instantclient
             Image: "ghcr.io/oracle/oraclelinux8-instantclient:21"
             Memory: 2048 # This will kill the instantclient container if it goes over 2048, to preserve the connector container.

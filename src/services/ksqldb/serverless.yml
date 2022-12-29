@@ -33,6 +33,7 @@ custom:
       - val
       - production
   vpc: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/vpc, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/vpc}
+  ksqldbImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/ksqldb-server:0.26.0"}
   brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
   headlessSqlContents: ${file(./compileDDL.js):ddl}
   scripts:
@@ -139,13 +140,17 @@ resources:
                     - ssmmessages:OpenControlChannel
                     - ssmmessages:OpenDataChannel
                   Resource: "*"
+                - Effect: Allow
+                  Action:
+                    - ecr:BatchGetImage
+                  Resource: !Sub "arn:aws:ecr:${self:provider.region}:${AWS::AccountId}:repository/*"
 
     ksqldbHeadlessTaskDefinition:
       Type: "AWS::ECS::TaskDefinition"
       Properties:
         ContainerDefinitions:
           - Name: ksqldb-headless
-            Image: "confluentinc/ksqldb-server:0.26.0"
+            Image: ${self:custom.ksqldbImage}
             Ulimits:
               - Name: "nofile"
                 HardLimit: 1048576
@@ -217,7 +222,7 @@ resources:
                 awslogs-region: !Sub "${AWS::Region}"
                 awslogs-group: !Sub "${ksqldbHeadlessLogGroup}"
                 awslogs-stream-prefix: fargate
-
+                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
         Family: ${self:service}-${sls:stage}-ksqldb-headless
         NetworkMode: awsvpc
         ExecutionRoleArn: !GetAtt ksqldbHeadlessRole.Arn
@@ -297,7 +302,7 @@ resources:
       Properties:
         ContainerDefinitions:
           - Name: ksqldb-interactive
-            Image: "confluentinc/ksqldb-server:0.26.0"
+            Image: ${self:custom.ksqldbImage}
             Command:
               - bash
               - "-c"
@@ -306,7 +311,7 @@ resources:
                 echo "int ksqlDB task..." &&
                 cd ~ &&
                 curl -O https://packages.confluent.io/archive/7.0/confluent-community-7.0.0.tar.gz &&
-                tar -xzvf confluent-community-7.0.0.tar.gz && 
+                tar -xzvf confluent-community-7.0.0.tar.gz &&
                 ln -s confluent-community-7.0.0 confluent-community &&
                 /usr/bin/docker/run
             Environment:
@@ -340,6 +345,7 @@ resources:
                 awslogs-region: !Sub "${AWS::Region}"
                 awslogs-group: !Sub "${ksqldbIntLogGroup}"
                 awslogs-stream-prefix: fargate
+                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
         Family: ${self:service}-${sls:stage}-ksqldbInt
         NetworkMode: awsvpc
         ExecutionRoleArn: !GetAtt ksqldbHeadlessRole.Arn
