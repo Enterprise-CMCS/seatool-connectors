@@ -24,7 +24,7 @@ provider:
   iam:
     role:
       path: /delegatedadmin/developer/
-      permissionsBoundary: !Sub arn:aws:iam::${AWS::AccountId}:policy/cms-cloud-admin/ct-ado-poweruser-permissions-boundary-policy
+      permissionsBoundary: arn:aws:iam::${aws:accountId}:policy/cms-cloud-admin/developer-boundary-policy
       statements:
         - Effect: "Allow"
           Action:
