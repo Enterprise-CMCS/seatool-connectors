@@ -13,3 +13,5 @@ services:
     params:
       ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
     dependsOn: topics
+  dashboard:
+    path: src/services/dashboard
