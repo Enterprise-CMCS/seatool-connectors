@@ -230,6 +230,61 @@ yargs(process.argv.slice(2))
       }
     }
   )
+  .command(
+    "base-update",
+    "this will upgrade your code to the latest version of the base template",
+    {},
+    async () => {
+      const addRemoteCommand = [
+        "git",
+        "remote",
+        "add",
+        "base",
+        "https://github.com/Enterprise-CMCS/macpro-base-template",
+      ];
+
+      await runner.run_command_and_output(
+        "Upgrade from Base | adding remote",
+        addRemoteCommand,
+        ".",
+        true
+      );
+
+      const fetchBaseCommand = ["git", "fetch", "base"];
+
+      await runner.run_command_and_output(
+        "Upgrade from Base | fetching base template",
+        fetchBaseCommand,
+        "."
+      );
+
+      const mergeCommand = ["git", "merge", "base/production", "--no-ff"];
+
+      await runner.run_command_and_output(
+        "Upgrade from Base | merging code from base template",
+        mergeCommand,
+        ".",
+        true
+      );
+
+      console.log(
+        "Merge command was performed. You may have conflicts. This is normal behaivor. To complete the update process fix any conflicts, commit, push, and open a PR."
+      );
+    }
+  )
+  .command(
+    ["listRunningStages", "runningEnvs", "listRunningEnvs"],
+    "Reports on running environments in your currently connected AWS account.",
+    {},
+    async () => {
+      await install_deps_for_services();
+      for (const region of [process.env.REGION_A]) {
+        const runningStages =
+          await ServerlessRunningStages.getAllStagesForRegion(region!);
+        console.log(`runningStages=${runningStages.join(",")}`);
+      }
+    }
+  )
   .strict() // This errors and prints help if you pass an unknown command
   .scriptName("run") // This modifies the displayed help menu to show 'run' isntead of 'dev.js'
   .demandCommand(1, "").argv; // this prints out the help if you don't call a subcommand

@@ -19,6 +19,20 @@ This SOP is suited for anyone involved with project creation. Parts will be non 
 1. Create a new Slack channel for the project.
 1. Bootstrap the new project with the base template.
 
+## Video Walkthrough
+
+A video walkthrough of this new project creation procedure is provided, to accompany the docs.  It's our longest video walkthrough, so it's cut into 12 minute parts:
+
+[Part 1 - New Project Setup](https://user-images.githubusercontent.com/48921055/215788850-de1fc49a-18c2-419e-af74-da35816a4a03.mp4){:target="_blank"}
+
+[Part 2 - New Project Setup](https://user-images.githubusercontent.com/48921055/215788887-2fae5af6-eb89-40ff-87ba-314a96d06b06.mp4){:target="_blank"}
+
+[Part 3 - New Project Setup](https://user-images.githubusercontent.com/48921055/215788913-b7e2f76a-614a-4139-8a34-cedeb79e5e60.mp4){:target="_blank"}
+
+[Part 4 - New Project Setup](https://user-images.githubusercontent.com/48921055/215788926-4060eef2-c47a-4067-b17f-a138f91db69b.mp4){:target="_blank"}
+
+[Part 5 - New Project Setup](https://user-images.githubusercontent.com/48921055/215788936-71f91418-8fdd-4cc1-901a-b843de355ed7.mp4){:target="_blank"}
+
 ## Details
 
 ### Step 1: Request a new GitHub repository for the project.
@@ -58,7 +72,7 @@ Someone with appropriate permissions can follow this procedure to create a new S
     1. Right click -> Copy -> Copy Link. You may put this link somewhere like a notepad as you will use it later. But don’t worry, this can always be found again.
 1. You may add anyone who should have access to the channel.
 
-### Bootstrap the new repository.
+### Step 4: Bootstrap the new repository.
 New MACPRO project repositories are bootstrapped with code from our base template repository. This base template repository is a github repo itself; it’s maintained by the MACPRO Platform Team as the standard MACPRO project structure. It includes patterns for deployment, deployment of dev branches, testing, security scanning, and so forth. There’s a lot of functionality packed into it, without commenting much on the actual application architecture. This is done deliberately, so projects may use the template as a starting point, and build the new project’s services on top of it. In the future, there may be other templates that are more specific, such as a webapp template or a kafka consumer template, but for now there is only the single base template. This step involved getting the latest copy of that template and pushing it to the new project repository.
 
 For the purposes of these instructions, we will assume your new repository (created in the steps above) is called acme, and is in the Enterprise-CMCS organization.  We will also assume the template repository you will bootstrap your project with is called macpro-base-template, in the same org.
@@ -67,24 +81,52 @@ For the purposes of these instructions, we will assume your new repository (crea
     - Click Settings
     - Click Actions (left hand side) -> General
     - Select 'Allow all actions and reusable workflows', if not already selected.  If this option is not already set and not selectable, you will need to open a ticket with the CMS Cloud team.
-1. Clone the macpro-base-template's production branch, and push it to your new repository's master branch.
-  ```
-  git clone -b production git@github.com:Enterprise-CMCS/macpro-base-template.git
-  cd macpro-base-template
-  git remote add acme git@github.com:Enterprise-CMCS/acme.git
-  git push acme master
-  ```
 1. Ensure 'master' is set as the default branch for the new repository.
     - Go to the repo in GitHub in a web browser.
     - Click Settings
     - Click Branches (left hand side)
     - Set master as the default, if not already set.
-1. Trigger the deployment of your repo's GitHub Pages (documentation) site.
+1. Enable GitHub Pages to run on the master branch.
     - Go to the repo in GitHub in a web browser.
-    - Click Actions
-    - Select 'Deploy Jekyll with GitHub Pages' (left hand side)
-    - Click Run Workflow (right hand side).  When the drop down appears, leave the branch set to master, and click Run workflow.
-    - CIRCLEBACK TO GET URL
+    - Click Settings
+    - Click Pages (left hand side)
+    - Under the Source dropdown, select GitHub Actions
+1. Configure Dependabot
+    - Go to the repo in GitHub in a web browser.
+    - Click Settings
+    - Click Code security and analysis
+    - Enable Dependency Graph
+    - Enable Dependabot alerts
+    - Disable Dependabot security updates
+    - Disable version updates
+1. Clone your new repository.  
+    ```
+    git clone git@github.com:Enterprise-CMCS/acme.git
+    ```
+1. Create val and production branches off of master, then go back to master.
+    ```
+    cd acme
+    git checkout -b val
+    git push --set-upstream origin val
+    git checkout -b production
+    git push --set-upstream origin production
+    git checkout master
+    ```
+1. Push macpro-base-template's production branch to your new repository's master branch.
+    ```
+    cd acme
+    git checkout master
+    git remote add base git@github.com:Enterprise-CMCS/macpro-base-template.git
+    git fetch base
+    git push origin base/production:master --force
+    git reset --hard origin/master
+    ```
+1. Fetch your (newly built) GitHub Pages site's url.
+    - Wait for the 'GitHub Pages' workflow, which triggered when you pushed, to finish.
+    - Go to the repo in GitHub in a web browser.
+    - Click Settings
+    - Click Pages
+    - You should see text that says "You site is live at https://xxxxxx".  Copy this url to a notepad; you'll need it in a later step.
 1. Add and configure the repository in Code Climate.
     - Go to [https://codeclimate.com/](https://codeclimate.com/)
     - Click Login -> Quality (top right).
@@ -100,9 +142,17 @@ For the purposes of these instructions, we will assume your new repository (crea
     - Go back to Repo Settings
     - Click Badges
     - Copy the HTML version of the Maintainability tag.  Keep this in a notepad for use later in these instructions.
-1. Update project specific values in your codebase; commit and push them to the master branch.
+1. Update project specific values in your codebase.
+    - Open your cloned copy of the acme project in an editor.
     - Open and edit acme/.envrc
-        - Update the value for PROJECT.  Shorter is usually better, as it is used extensively for namespacing purposes.  It should be all lower case, only contain letters and hyphens, and be unique in the target AWS accounts; that is, there should not be two repositories deploying to the same AWS account that use the same PROJECT value.
+        - Update the value for PROJECT.
+            - This value is used extensively in deployment, as it drives project namespacing.  It is what enables us to run many products in one AWS account ,if need be.
+            - This value is typically related to your project name.  However, it does not need to match exactly, or really at all.  
+            - To that point, a shorter name is preferred, as it will be put in many resource names.  For instance:  this repository, macpro-base-template, has a PROJECT value of just 'base'.  That's enough to be indicative of what project owns a resource with that tag, but not so long to be askward.
+            - Once you've chosen a new project name during project creation, changing it can be extremely difficult.  So take a minute and make sure it's what you want.
+    - Open and edit src/services/.oidc
+        - Find the line that reads `SubjectClaimFilters: "repo:Enterprise-CMCS/macpro-base-template:*"` 
+        - Update that line to reflect your new project org and repo:  `SubjectClaimFilters: "repo:Enterprise-CMCS/acme:*"`
     - Open and edit acme/README.md
         - Find all `https://enterprise-cmcs.github.io/macpro-base-template/` and replace all with the url to your GitHub Pages docs site.
         - Find all `https://cmsgov.slack.com/archives/C04D6HXJ3GA` and replace all with the url to your project Slack channel.
@@ -116,7 +166,82 @@ For the purposes of these instructions, we will assume your new repository (crea
     - Open and edit the project's top level package.json file to be accurate.  Updates should include name, description, repository.url, and homepage.
     - Open and edit the Jekyll config file, docs/_config.yml.  Rather than list each place where a value might need replacing/updating, we recommend you walk through this file in detail.  It's a config file, so most of it's information will need updating.
     - Update the docs site overview information, located at docs/docs/overview.md - subsection Overview.  we recommend reusing the overview you put in the README
-    - Commit and push all changes to your new repository, and check the GitHub Actions for success.
+1. Deploy the OIDC service, and stage the created oidc role information in GitHub Secrets.
+    - This requires a fully configured workstation and a developer to run commands.  Be sure the workstation has successfully run through the workspace setup procedure.
+    - Go to the repository, give direnv authorization to modify your shell, and install all dependencies for the project.
+        -   ```
+            cd acme
+            direnv allow
+            run install
+            ```
+    - For the 'dev' AWS environment:
+         - Get AWS access keys from Kion, and export them to a terminal.
+         -  ```
+            cd acme/src/services/.oidc
+            CI=true sls deploy --stage master
+            ```
+         - Upon the above deploy command's completion, run the serverless info command to retrieve the ServiceRoleArn value.
+            - `sls info --stage master --verbose`
+            - Find and copy the value for ServiceRoleArn to a notepad.
+         - Go to your repository in a browser.
+         - Navigate:  Settings -> Secrets and variables -> Actions -> New repository secret
+         - Set a secret named AWS_OIDC_ROLE_TO_ASSUME, and set it's value to the ServiceRoleARN value you copied from the above step.  Click add secret.
+         - This secret will be used by any branch that otherwise doesn't have a higher order secret (val and production will, in this next steps).
+    - For the 'impl' (or maybe called 'val') AWS environment:  (NOTE:  Please read carefully, as the exact commands and github console steps are different than dev above.)
+         - Get AWS access keys from Kion, and export them to a terminal.
+         -  ```
+            cd acme/src/services/.oidc
+            CI=true sls deploy --stage val
+            ```
+         - Upon the above deploy command's completion, run the serverless info command to retrieve the ServiceRoleArn value.
+            - `sls info --stage val --verbose`
+            - Find and copy the value for ServiceRoleArn to a notepad.
+         - Go to your repository in a browser.
+        - Navigate:  Settings -> Environments -> New environment
+        - Create a new environment named val.
+        - Add a new secret under 'Environment secrets'.  It's name should be AWS_OIDC_ROLE_TO_ASSUME and it's value should should be the ServiceRoleARN value you copied from the above step.
+        - This is a great time to set environment protection rules and required reviewers, but we will skip detaili on that at this stage, as that's optional.
+    - For the 'production' (or maybe called 'prod') AWS environment:  (NOTE:  Please read carefully, as the exact commands and github console steps are different than dev and impl above.)
+         - Get AWS access keys from Kion, and export them to a terminal.
+         -  ```
+            cd acme/src/services/.oidc
+            CI=true sls deploy --stage production
+            ```
+         - Upon the above deploy command's completion, run the serverless info command to retrieve the ServiceRoleArn value.
+            - `sls info --stage production --verbose`
+            - Find and copy the value for ServiceRoleArn to a notepad.
+         - Go to your repository in a browser.
+        - Navigate:  Settings -> Environments -> New environment
+        - Create a new environment named production.
+        - Add a new secret under 'Environment secrets'.  It's name should be AWS_OIDC_ROLE_TO_ASSUME and it's value should should be the ServiceRoleARN value you copied from the above step.
+        - This is a great time to set environment protection rules and required reviewers, but we will skip detaili on that at this stage, as that's optional.
+1. (optional) Add a SLACK_WEBHOOK GitHub Secret.
+    - Go to your repository in a browser.
+    - Navigate:  Settings -> Secrets and variables -> Actions -> New repository secret
+    - Set a secret named SLACK_WEBHOOK, and paste the value you have.
+1. Commit and push all changes to your repository, and monitor GitHub Actions for success/failure.
+1. Force push the master branch to val, and monitor GitHub Actions for success/failure:
+    ```
+    cd acme
+    git checkout val
+    git reset --hard origin/master
+    git push --force
+    ```
+1. Force push the master branch to production, and monitor GitHub Actions for success/failure:
+    ```
+    cd acme
+    git checkout production
+    git reset --hard origin/master
+    git push --force
+    ```
+1. Add branch protection rules for each of the master, val, and production branches:
+    - Go to your repository in a browser.
+    - Navigate: Settings -> Branches, and add a new rule for each of the higher environment branches
+        - Click Add rule
+        - For 'Branch name pattern', enter the branch you want to protect, such as master.
+        - Select any rules you'd like to enforce.  We recommend at least requiring a pull request before merging.
+        - Repeat the above for val and production branches.
+    
 
 ### Conclusion
 If you’ve followed this document, you should have a new GitHub project deployed to AWS and ready for further development. This document is a WIP, and assuredly has errors and omissions, and will change over time. You can help this by reaching out to the MACPRO Platform team on Slack and letting us know about issues you find.
