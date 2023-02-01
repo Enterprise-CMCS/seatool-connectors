@@ -11,11 +11,18 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs14.x
   region: us-east-1
   stackTags:
     PROJECT: ${self:custom.project}
     SERVICE: ${self:service}
+
+params:
+  production:
+    claimFilter: environment:production
+  val:
+    claimFilter: environment:val
+  default:
+    claimFilter: "*"
 
 custom:
   project: ${env:PROJECT}
@@ -29,7 +36,7 @@ custom:
     - arn:aws:iam::${aws:accountId}:policy/ADO-Restriction-Policy
     - arn:aws:iam::${aws:accountId}:policy/CMSApprovedAWSServices
     - arn:aws:iam::aws:policy/AdministratorAccess
-  SubjectClaimFilters: "repo:Enterprise-CMCS/macpro-base-template:*"
+  SubjectClaimFilters: "repo:Enterprise-CMCS/macpro-base-template:${param:claimFilter}"
 resources:
   Resources:
     GitHubActionsServiceRole:
