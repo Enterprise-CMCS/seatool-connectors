@@ -26,8 +26,6 @@ provider:
     role:
       path: /delegatedadmin/developer/
       permissionsBoundary: arn:aws:iam::${aws:accountId}:policy/cms-cloud-admin/developer-boundary-policy
-      # managedPolicies:
-      #   - !Sub arn:aws:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole
 
 custom:
   project: ${env:PROJECT}

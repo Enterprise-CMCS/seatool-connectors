@@ -109,11 +109,11 @@ resources:
     ksqldbSecurityGroupIngressCluster:
       Type: AWS::EC2::SecurityGroupIngress
       Properties:
-        GroupId: !Sub "${ksqldbSecurityGroup}"
+        GroupId: !Ref ksqldbSecurityGroup
         IpProtocol: tcp
         FromPort: 8088
         ToPort: 8088
-        SourceSecurityGroupId: !Sub "${ksqldbSecurityGroup}"
+        SourceSecurityGroupId: !Ref ksqldbSecurityGroup
     ksqldbHeadlessRole:
       Type: "AWS::IAM::Role"
       Properties:
@@ -225,8 +225,8 @@ resources:
             LogConfiguration:
               LogDriver: awslogs
               Options:
-                awslogs-region: !Sub "${AWS::Region}"
-                awslogs-group: !Sub "${ksqldbHeadlessLogGroup}"
+                awslogs-region: !Ref AWS::Region
+                awslogs-group: !Ref ksqldbHeadlessLogGroup
                 awslogs-stream-prefix: fargate
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
         Family: ${self:service}-${sls:stage}-ksqldb-headless
@@ -247,7 +247,7 @@ resources:
     ksqldbHeadlessService:
       Type: "AWS::ECS::Service"
       Properties:
-        Cluster: !Sub "${ksqldbHeadlessCluster}"
+        Cluster: !Ref ksqldbHeadlessCluster
         DeploymentConfiguration:
           DeploymentCircuitBreaker:
             Enable: true
@@ -258,12 +258,12 @@ resources:
         LaunchType: FARGATE
         ServiceName: ksqldb-headless
         DesiredCount: 1
-        TaskDefinition: !Sub "${ksqldbHeadlessTaskDefinition}"
+        TaskDefinition: !Ref ksqldbHeadlessTaskDefinition
         NetworkConfiguration:
           AwsvpcConfiguration:
             AssignPublicIp: DISABLED
             SecurityGroups:
-              - !Sub "${ksqldbSecurityGroup}"
+              - !Ref ksqldbSecurityGroup
             Subnets: >-
               ${self:custom.vpc.privateSubnets}
     ECSFailureEventRule:
@@ -272,7 +272,7 @@ resources:
         Description: "ksqlDB Cluster Task Failure Event Rule"
         EventPattern:
           account:
-            - !Sub "${AWS::AccountId}"
+            - !Ref AWS::AccountId
           source:
             - "aws.ecs"
             - "demo.cli" # used to test events from the command line
@@ -348,8 +348,8 @@ resources:
             LogConfiguration:
               LogDriver: awslogs
               Options:
-                awslogs-region: !Sub "${AWS::Region}"
-                awslogs-group: !Sub "${ksqldbIntLogGroup}"
+                awslogs-region: !Ref AWS::Region
+                awslogs-group: !Ref ksqldbIntLogGroup
                 awslogs-stream-prefix: fargate
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
         Family: ${self:service}-${sls:stage}-ksqldbInt
@@ -364,19 +364,19 @@ resources:
     ksqldbIntService:
       Type: "AWS::ECS::Service"
       Properties:
-        Cluster: !Sub "${ksqldbHeadlessCluster}"
+        Cluster: !Ref ksqldbHeadlessCluster
         DeploymentConfiguration:
           MaximumPercent: 100
           MinimumHealthyPercent: 0
         LaunchType: FARGATE
         ServiceName: ksqldb-interactive
         DesiredCount: 0
-        TaskDefinition: !Sub "${ksqldbIntTaskDefinition}"
+        TaskDefinition: !Ref ksqldbIntTaskDefinition
         EnableExecuteCommand: true
         NetworkConfiguration:
           AwsvpcConfiguration:
             AssignPublicIp: DISABLED
             SecurityGroups:
-              - !Sub "${ksqldbSecurityGroup}"
+              - !Ref ksqldbSecurityGroup
             Subnets: >-
               ${self:custom.vpc.privateSubnets}
