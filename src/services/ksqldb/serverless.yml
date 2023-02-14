@@ -100,6 +100,12 @@ resources:
       Properties:
         GroupDescription: Security Group for the Fargate
         VpcId: ${self:custom.vpc.id}
+    ksqldbSecurityGroupEgress:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref ksqldbSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
     ksqldbSecurityGroupIngressCluster:
       Type: AWS::EC2::SecurityGroupIngress
       Properties:

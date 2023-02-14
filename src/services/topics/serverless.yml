@@ -88,3 +88,9 @@ resources:
       Properties:
         GroupDescription: Security Group for the lambdas
         VpcId: ${self:custom.vpc.id}
+    LambdaSecurityGroupEgress:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref LambdaSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
