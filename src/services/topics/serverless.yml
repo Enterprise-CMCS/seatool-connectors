@@ -26,8 +26,6 @@ provider:
     role:
       path: /delegatedadmin/developer/
       permissionsBoundary: arn:aws:iam::${aws:accountId}:policy/cms-cloud-admin/developer-boundary-policy
-      # managedPolicies:
-      #   - !Sub arn:aws:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole
 
 custom:
   project: ${env:PROJECT}
@@ -88,3 +86,9 @@ resources:
       Properties:
         GroupDescription: Security Group for the lambdas
         VpcId: ${self:custom.vpc.id}
+    LambdaSecurityGroupEgress:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref LambdaSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
