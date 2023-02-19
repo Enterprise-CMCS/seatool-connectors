@@ -141,57 +141,105 @@ resources:
         ServiceToken: !GetAtt TopicsLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
         Namespace: ${param:topicNamespace}
-        Config:
-          - topicPrefix: aws.seatool.cmcs
-            numPartitions: 1
-            replicationFactor: 3
-            topics:
-              - ""
-              - .dbHistory
-              - .dbo.Action_Officers
-              - .dbo.Action_Types
-              - .dbo.aspnet_Users
-              - .dbo.Call_Held_Reasons
-              - .dbo.Code_After_Init_Assess
-              - .dbo.Column_Definition
-              - .dbo.Components_StatePlans
-              - .dbo.Components
-              - .dbo.Early_Alert_Field_Types
-              - .dbo.Early_Alert_Fields
-              - .dbo.Email
-              - .dbo.EmailDistribution
-              - .dbo.Holiday
-              - .dbo.OCD_Review
-              - .dbo.Officers
-              - .dbo.Plan_Types
-              - .dbo.Position
-              - .dbo.Priority_Codes
-              - .dbo.Priority_Complexity
-              - .dbo.Priority_Review_Position
-              - .dbo.RAI
-              - .dbo.Region_Access
-              - .dbo.Region
-              - .dbo.SPA_Type
-              - .dbo.SPW_Status
-              - .dbo.State_Plan_1115_State_PN
-              - .dbo.State_Plan_1115_TE
-              - .dbo.State_Plan_1115
-              - .dbo.State_Plan_APD_Sub_Type
-              - .dbo.State_Plan_APD
-              - .dbo.State_Plan_Early_Alerts
-              - .dbo.State_Plan_Impact_Funding
-              - .dbo.State_Plan
-              - .dbo.States_Officer_Represents
-              - .dbo.States
-              - .dbo.Stop_Resume_Dates
-              - .dbo.Sub_Type
-              - .dbo.Table_Definition
-              - .dbo.Title_Type
-              - .dbo.Type
-              - .dbo.State_Plan_Service_Types
-              - .dbo.State_Plan_Service_SubTypes
-        ExtraTopicsToDeleteOnDestroy:
-          - 
+        Bump: asdfasdfaaaasdf
+        TopicsToCreate:
+          - name: aws.seatool.cmcs
+          - name: aws.seatool.cmcs.dbHistory
+          - name: aws.seatool.cmcs.dbo.Action_Officers
+          - name: aws.seatool.cmcs.dbo.Action_Types
+          - name: aws.seatool.cmcs.dbo.aspnet_Users
+          - name: aws.seatool.cmcs.dbo.Call_Held_Reasons
+          - name: aws.seatool.cmcs.dbo.Code_After_Init_Assess
+          - name: aws.seatool.cmcs.dbo.Column_Definition
+          - name: aws.seatool.cmcs.dbo.Components_StatePlans
+          - name: aws.seatool.cmcs.dbo.Components
+          - name: aws.seatool.cmcs.dbo.Early_Alert_Field_Types
+          - name: aws.seatool.cmcs.dbo.Early_Alert_Fields
+          - name: aws.seatool.cmcs.dbo.Email
+          - name: aws.seatool.cmcs.dbo.EmailDistribution
+          - name: aws.seatool.cmcs.dbo.Holiday
+          - name: aws.seatool.cmcs.dbo.OCD_Review
+          - name: aws.seatool.cmcs.dbo.Officers
+          - name: aws.seatool.cmcs.dbo.Plan_Types
+          - name: aws.seatool.cmcs.dbo.Position
+          - name: aws.seatool.cmcs.dbo.Priority_Codes
+          - name: aws.seatool.cmcs.dbo.Priority_Complexity
+          - name: aws.seatool.cmcs.dbo.Priority_Review_Position
+          - name: aws.seatool.cmcs.dbo.RAI
+          - name: aws.seatool.cmcs.dbo.Region_Access
+          - name: aws.seatool.cmcs.dbo.Region
+          - name: aws.seatool.cmcs.dbo.SPA_Type
+          - name: aws.seatool.cmcs.dbo.SPW_Status
+          - name: aws.seatool.cmcs.dbo.State_Plan_1115_State_PN
+          - name: aws.seatool.cmcs.dbo.State_Plan_1115_TE
+          - name: aws.seatool.cmcs.dbo.State_Plan_1115
+          - name: aws.seatool.cmcs.dbo.State_Plan_APD_Sub_Type
+          - name: aws.seatool.cmcs.dbo.State_Plan_APD
+          - name: aws.seatool.cmcs.dbo.State_Plan_Early_Alerts
+          - name: aws.seatool.cmcs.dbo.State_Plan_Impact_Funding
+          - name: aws.seatool.cmcs.dbo.State_Plan
+          - name: aws.seatool.cmcs.dbo.States_Officer_Represents
+          - name: aws.seatool.cmcs.dbo.States
+          - name: aws.seatool.cmcs.dbo.Stop_Resume_Dates
+          - name: aws.seatool.cmcs.dbo.Sub_Type
+          - name: aws.seatool.cmcs.dbo.Table_Definition
+          - name: aws.seatool.cmcs.dbo.Title_Type
+          - name: aws.seatool.cmcs.dbo.Type
+          - name: aws.seatool.cmcs.dbo.State_Plan_Service_Types
+          - name: aws.seatool.cmcs.dbo.State_Plan_Service_SubTypes
+        # TopicsToDelete:
+        #   - aws.seatool.cmcs
+        #   - aws.seatool.cmcs.dbHistory
+        #   - aws.seatool.cmcs.dbo.Action_Officers
+        #   - aws.seatool.cmcs.dbo.Action_Types
+        #   - aws.seatool.cmcs.dbo.aspnet_Users
+        #   - aws.seatool.cmcs.dbo.Call_Held_Reasons
+        #   - aws.seatool.cmcs.dbo.Code_After_Init_Assess
+        #   - aws.seatool.cmcs.dbo.Column_Definition
+        #   - aws.seatool.cmcs.dbo.Components_StatePlans
+        #   - aws.seatool.cmcs.dbo.Components
+        #   - aws.seatool.cmcs.dbo.Early_Alert_Field_Types
+        #   - aws.seatool.cmcs.dbo.Early_Alert_Fields
+        #   - aws.seatool.cmcs.dbo.Email
+        #   - aws.seatool.cmcs.dbo.EmailDistribution
+        #   - aws.seatool.cmcs.dbo.Holiday
+        #   - aws.seatool.cmcs.dbo.OCD_Review
+        #   - aws.seatool.cmcs.dbo.Officers
+        #   - aws.seatool.cmcs.dbo.Plan_Types
+        #   - aws.seatool.cmcs.dbo.Position
+        #   - aws.seatool.cmcs.dbo.Priority_Codes
+        #   - aws.seatool.cmcs.dbo.Priority_Complexity
+        #   - aws.seatool.cmcs.dbo.Priority_Review_Position
+        #   - aws.seatool.cmcs.dbo.RAI
+        #   - aws.seatool.cmcs.dbo.Region_Access
+        #   - aws.seatool.cmcs.dbo.Region
+        #   - aws.seatool.cmcs.dbo.SPA_Type
+        #   - aws.seatool.cmcs.dbo.SPW_Status
+        #   - aws.seatool.cmcs.dbo.State_Plan_1115_State_PN
+        #   - aws.seatool.cmcs.dbo.State_Plan_1115_TE
+        #   - aws.seatool.cmcs.dbo.State_Plan_1115
+        #   - aws.seatool.cmcs.dbo.State_Plan_APD_Sub_Type
+        #   - aws.seatool.cmcs.dbo.State_Plan_APD
+        #   - aws.seatool.cmcs.dbo.State_Plan_Early_Alerts
+        #   - aws.seatool.cmcs.dbo.State_Plan_Impact_Funding
+        #   - aws.seatool.cmcs.dbo.State_Plan
+        #   - aws.seatool.cmcs.dbo.States_Officer_Represents
+        #   - aws.seatool.cmcs.dbo.States
+        #   - aws.seatool.cmcs.dbo.Stop_Resume_Dates
+        #   - aws.seatool.cmcs.dbo.Sub_Type
+        #   - aws.seatool.cmcs.dbo.Table_Definition
+        #   - aws.seatool.cmcs.dbo.Title_Type
+        #   - aws.seatool.cmcs.dbo.Type
+        #   - aws.seatool.cmcs.dbo.State_Plan_Service_Types
+        #   - aws.seatool.cmcs.dbo.State_Plan_Service_SubTypes
+
+        #   - topicPrefix: aws.seatool.cmcs
+        #     numPartitions: 1
+        #     replicationFactor: 3
+        #     topics:
+
+        # ExtraTopicsToDeleteOnDestroy:
+        #   -
     TopicsSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
