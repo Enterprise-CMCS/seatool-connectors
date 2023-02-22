@@ -17,17 +17,15 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x
   region: ${env:REGION_A}
   stackTags:
     PROJECT: ${self:custom.project}
     SERVICE: ${self:service}
   iam:
     role:
-      path: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/iam/path, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/iam/path}
-      permissionsBoundary: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/iam/permissionsBoundary, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/iam/permissionsBoundary}
-      # managedPolicies:
-      #   - !Sub arn:aws:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole
+      path: /delegatedadmin/developer/
+      permissionsBoundary: arn:aws:iam::${aws:accountId}:policy/cms-cloud-admin/developer-boundary-policy
 
 custom:
   project: ${env:PROJECT}
@@ -88,3 +86,9 @@ resources:
       Properties:
         GroupDescription: Security Group for the lambdas
         VpcId: ${self:custom.vpc.id}
+    LambdaSecurityGroupEgress:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref LambdaSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0

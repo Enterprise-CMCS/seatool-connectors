@@ -16,15 +16,15 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x
   region: ${env:REGION_A}
   stackTags:
     PROJECT: ${self:custom.project}
     SERVICE: ${self:service}
   iam:
     role:
-      path: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/iam/path, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/iam/path}
-      permissionsBoundary: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/iam/permissionsBoundary, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/iam/permissionsBoundary}
+      path: /delegatedadmin/developer/
+      permissionsBoundary: arn:aws:iam::${aws:accountId}:policy/cms-cloud-admin/developer-boundary-policy
       statements:
         - Effect: "Allow"
           Action:
@@ -135,22 +135,28 @@ resources:
       Properties:
         GroupDescription: Security Group for the Fargate Connect Workers.
         VpcId: ${self:custom.vpc.id}
+    KafkaConnectWorkerSecurityGroupEgressLambda:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref KafkaConnectWorkerSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
     KafkaConnectWorkerSecurityGroupIngressLambda:
       Type: AWS::EC2::SecurityGroupIngress
       Properties:
-        GroupId: !Sub "${KafkaConnectWorkerSecurityGroup}"
+        GroupId: !Ref KafkaConnectWorkerSecurityGroup
         IpProtocol: tcp
         FromPort: 8083
         ToPort: 8083
-        SourceSecurityGroupId: !Sub "${LambdaConfigureConnectorsSecurityGroup}"
+        SourceSecurityGroupId: !Ref LambdaConfigureConnectorsSecurityGroup
     KafkaConnectWorkerSecurityGroupIngressCluster:
       Type: AWS::EC2::SecurityGroupIngress
       Properties:
-        GroupId: !Sub "${KafkaConnectWorkerSecurityGroup}"
+        GroupId: !Ref KafkaConnectWorkerSecurityGroup
         IpProtocol: tcp
         FromPort: 8083
         ToPort: 8083
-        SourceSecurityGroupId: !Sub "${KafkaConnectWorkerSecurityGroup}"
+        SourceSecurityGroupId: !Ref KafkaConnectWorkerSecurityGroup
     KafkaConnectWorkerRole:
       Type: "AWS::IAM::Role"
       Properties:
@@ -181,6 +187,7 @@ resources:
                   Action:
                     - ecr:BatchGetImage
                   Resource: !Sub "arn:aws:ecr:${self:provider.region}:${AWS::AccountId}:repository/*"
+
     KafkaConnectWorkerTaskDefinition:
       Type: "AWS::ECS::TaskDefinition"
       Properties:
@@ -242,8 +249,8 @@ resources:
             LogConfiguration:
               LogDriver: awslogs
               Options:
-                awslogs-region: !Sub "${AWS::Region}"
-                awslogs-group: !Sub "${KafkaConnectWorkerLogGroup}"
+                awslogs-region: !Ref AWS::Region
+                awslogs-group: !Ref KafkaConnectWorkerLogGroup
                 awslogs-stream-prefix: fargate
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
           - Name: instantclient
@@ -270,7 +277,7 @@ resources:
     KafkaConnectService:
       Type: "AWS::ECS::Service"
       Properties:
-        Cluster: !Sub "${KafkaConnectCluster}"
+        Cluster: !Ref KafkaConnectCluster
         DeploymentConfiguration:
           DeploymentCircuitBreaker:
             Enable: true
@@ -281,12 +288,12 @@ resources:
         LaunchType: FARGATE
         ServiceName: kafka-connect
         DesiredCount: 1
-        TaskDefinition: !Sub "${KafkaConnectWorkerTaskDefinition}"
+        TaskDefinition: !Ref KafkaConnectWorkerTaskDefinition
         NetworkConfiguration:
           AwsvpcConfiguration:
             AssignPublicIp: DISABLED
             SecurityGroups:
-              - !Sub "${KafkaConnectWorkerSecurityGroup}"
+              - !Ref KafkaConnectWorkerSecurityGroup
             Subnets: >-
               ${self:custom.vpc.dataSubnets}
     ECSFailureEventRule:
@@ -295,7 +302,7 @@ resources:
         Description: "Connector Task Failure Event Rule"
         EventPattern:
           account:
-            - !Sub "${AWS::AccountId}"
+            - !Ref AWS::AccountId
           source:
             - "aws.ecs"
             - "demo.cli" # used to test events from the command line
@@ -351,6 +358,12 @@ resources:
       Properties:
         GroupDescription: Security Group for configuring the connector.
         VpcId: ${self:custom.vpc.id}
+    LambdaConfigureConnectorsSecurityGroupEgress:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref LambdaConfigureConnectorsSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
     ConnectorLogsErrorCount:
       Type: AWS::Logs::MetricFilter
       Properties:
