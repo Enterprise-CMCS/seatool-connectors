@@ -101,6 +101,14 @@ functions:
       subnetIds: >-
         ${self:custom.vpc.privateSubnets}
     timeout: 300
+  cleanupKafka:
+    handler: handlers/cleanupKafka.handler
+    vpc:
+      securityGroupIds:
+        - Ref: LambdaSecurityGroup
+      subnetIds: >-
+        ${self:custom.vpc.privateSubnets}
+    timeout: 300
   configureConnectors:
     handler: handlers/configureConnectors.handler
     environment:
@@ -141,7 +149,6 @@ resources:
       Properties:
         ServiceToken: !GetAtt CreateTopicsLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
-        Bump: bumpbump
         TopicsToCreate:
           - name: ${param:topicNamespace}aws.seatool.cmcs
           - name: ${param:topicNamespace}aws.seatool.cmcs.dbHistory
@@ -187,6 +194,13 @@ resources:
           - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Type
           - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_Types
           - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_SubTypes
+    CleanupKafka:
+      Type: Custom::CleanupKafka
+      Properties:
+        ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
+        BrokerString: ${self:custom.brokerString}
+        TopicsToDelete:
+          - ${param:topicNamespace}aws.seatool.cmcs.dbo.*
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
