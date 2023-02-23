@@ -201,6 +201,7 @@ resources:
         BrokerString: ${self:custom.brokerString}
         TopicsToDelete:
           - ${param:topicNamespace}aws.seatool.cmcs.dbo.*
+          - ${param:topicNamespace}mgmt.connect.${self:service}*
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
