@@ -1,6 +1,6 @@
 import { send, SUCCESS, FAILED } from "cfn-response-async";
 import * as topics from "../../../libs/topics-lib.js";
-// import _ from "lodash";
+
 exports.handler = async function (event, context) {
   console.log("Request:", JSON.stringify(event, undefined, 2));
   const responseData = {};
