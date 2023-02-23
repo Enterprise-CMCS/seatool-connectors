@@ -9,7 +9,7 @@ exports.handler = async function (event, context) {
     const BrokerString = event.ResourceProperties.BrokerString;
     const TopicsToDelete = event.ResourceProperties.TopicsToDelete;
     if (event.RequestType === "Create" || event.RequestType == "Update") {
-      console.log("This resource does nothing on Create and Update events.")
+      console.log("This resource does nothing on Create and Update events.");
     } else if (event.RequestType === "Delete") {
       if (
         !TopicsToDelete.every((expression) => {
