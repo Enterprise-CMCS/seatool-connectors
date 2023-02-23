@@ -4,7 +4,7 @@ services:
   connector:
     path: src/services/connector
     params:
-    ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
   ksqldb:
     path: src/services/ksqldb
     params:
