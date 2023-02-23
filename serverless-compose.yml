@@ -3,13 +3,11 @@ services:
     path: src/services/alerts
   connector:
     path: src/services/connector
-    # params:
-    # ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
-    # dependsOn: topics
-  # ksqldb:
-  #   path: src/services/ksqldb
-  #   params:
-  #     ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
-  #   dependsOn: topics
+    params:
+    ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+  ksqldb:
+    path: src/services/ksqldb
+    params:
+      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
   dashboard:
     path: src/services/dashboard
