@@ -34,7 +34,9 @@ custom:
       - production
   vpc: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/vpc, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/vpc}
   ksqldbImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/ksqldb-server:0.26.0"}
-  brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
+  # REVERTME before merge
+  # brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
+  brokerString: ${ssm:/aws/reference/secretsmanager/seatool/mike/brokerString}
   headlessSqlContents: ${file(./compileDDL.js):ddl}
   scripts:
     hooks:
@@ -88,6 +90,14 @@ functions:
     handler: handlers/dummy.myHandler
     layers:
       - !Ref DummyLambdaLayer
+  cleanupKafka:
+    handler: handlers/cleanupKafka.handler
+    vpc:
+      securityGroupIds:
+        - Ref: LambdaSecurityGroup
+      subnetIds: >-
+        ${self:custom.vpc.privateSubnets}
+    timeout: 300
 
 resources:
   Resources:
@@ -238,6 +248,8 @@ resources:
         Memory: ${param:memory}
         Cpu: ${param:cpu}
         EphemeralStorage: 200
+      DependsOn:
+        - CleanupKafka
 
     ksqldbHeadlessCluster:
       Type: "AWS::ECS::Cluster"
@@ -361,6 +373,9 @@ resources:
         Memory: 4096
         Cpu: 2048
         EphemeralStorage: 50
+      DependsOn:
+        - CleanupKafka
+
     ksqldbIntService:
       Type: "AWS::ECS::Service"
       Properties:
@@ -380,3 +395,12 @@ resources:
               - !Ref ksqldbSecurityGroup
             Subnets: >-
               ${self:custom.vpc.privateSubnets}
+    CleanupKafka:
+      Type: Custom::CleanupKafka
+      Properties:
+        ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
+        BrokerString: ${self:custom.brokerString}
+        TopicPatternsToDelete:
+          - ${param:topicNamespace}aws.ksqldb*
+          - ${param:topicNamespace}${self:service}-*
+          - _confluent-ksql-${param:topicNamespace}${self:service}-*
