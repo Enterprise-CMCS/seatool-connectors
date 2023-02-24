@@ -12,7 +12,7 @@ exports.handler = async function (event, context) {
     if (event.RequestType === "Create" || event.RequestType == "Update") {
       console.log("This resource does nothing on Create and Update events.");
     } else if (event.RequestType === "Delete") {
-      // Filter out patterns that don't contain our --project--stage-- convention for ephemeral branch topics.
+      // Quietly filter out non-compliant patterns; we only delete patterns that contain --.*--.*--
       const validDeletePatterns = TopicPatternsToDelete.filter(
         (pattern) => !!pattern.match(/.*--.*--.*--.*/g)
       );
