@@ -34,9 +34,7 @@ custom:
       - production
   vpc: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/vpc, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/vpc}
   ksqldbImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/ksqldb-server:0.26.0"}
-  # REVERTME before merge
-  # brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
-  brokerString: ${ssm:/aws/reference/secretsmanager/seatool/mike/brokerString}
+  brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
   headlessSqlContents: ${file(./compileDDL.js):ddl}
   scripts:
     hooks:
