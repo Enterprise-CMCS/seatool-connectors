@@ -12,14 +12,10 @@ exports.handler = async function (event, context) {
     if (event.RequestType === "Create" || event.RequestType == "Update") {
       console.log("This resource does nothing on Create and Update events.");
     } else if (event.RequestType === "Delete") {
-      // Quietly filter out non-compliant patterns; we only delete patterns that contain --.*--.*--
-      const validDeletePatterns = TopicPatternsToDelete.filter(
-        (pattern) => !!pattern.match(/.*--.*--.*--.*/g)
-      );
       console.log(
-        `Attempting a delete for each of the following patterns:  ${validDeletePatterns}`
+        `Attempting a delete for each of the following patterns:  ${TopicPatternsToDelete}`
       );
-      await topics.deleteTopics(BrokerString, validDeletePatterns);
+      await topics.deleteTopics(BrokerString, TopicPatternsToDelete);
     }
   } catch (error) {
     console.error(error);

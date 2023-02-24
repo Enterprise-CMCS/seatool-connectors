@@ -96,13 +96,6 @@ export async function createTopics(brokerString, topicConfig) {
 }
 
 export async function deleteTopics(brokerString, topicList) {
-  // Check that each topic in the list is something we can delete
-  for (var topic of topicList) {
-    if (!topic.match(/.*--.*--.*--.*/g)) {
-      throw "ERROR:  The deleteTopics function only operates against topics that match /.*--.*--.*--.*/g";
-    }
-  }
-
   const brokers = brokerString.split(",");
 
   const kafka = new Kafka({
