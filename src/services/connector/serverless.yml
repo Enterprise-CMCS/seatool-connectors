@@ -202,6 +202,7 @@ resources:
         TopicPatternsToDelete:
           - ${param:topicNamespace}aws.seatool.cmcs*
           - ${param:topicNamespace}mgmt.connect.${self:service}*
+          - jeremyclarkson
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
