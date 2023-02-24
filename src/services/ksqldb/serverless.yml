@@ -404,3 +404,14 @@ resources:
           - ${param:topicNamespace}aws.ksqldb*
           - ${param:topicNamespace}${self:service}-*
           - _confluent-ksql-${param:topicNamespace}${self:service}-*
+    LambdaSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Security Group for the topics lambda function
+        VpcId: ${self:custom.vpc.id}
+    LambdaSecurityGroupEgress:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref LambdaSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
