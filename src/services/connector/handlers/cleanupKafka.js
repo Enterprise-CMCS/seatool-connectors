@@ -12,19 +12,14 @@ exports.handler = async function (event, context) {
     if (event.RequestType === "Create" || event.RequestType == "Update") {
       console.log("This resource does nothing on Create and Update events.");
     } else if (event.RequestType === "Delete") {
-      if (
-        TopicPatternsToDelete.every((expression) => {
-          return !!expression.match(/.*--.*--.*--.*/g); // The !! converts to a boolean; true if match is found
-        })
-      ) {
-        await topics.deleteTopics(BrokerString, TopicPatternsToDelete);
-      } else {
-        console.log(`
-        WARNING:  Only patterns that include a namespace qualifier can be deleted; they must match /.*--.*--.*--.*/g
-        You have passed at least one pattern that does not match this pattern.
-        This resource will do nothing.
-        `);
-      }
+      // Filter out patterns that don't contain our --project--stage-- convention for ephemeral branch topics.
+      const validDeletePatterns = TopicPatternsToDelete.filter(
+        (pattern) => !!pattern.match(/.*--.*--.*--.*/g)
+      );
+      console.log(
+        `Attempting a delete for each of the following patterns:  ${validDeletePatterns}`
+      );
+      await topics.deleteTopics(BrokerString, validDeletePatterns);
     }
   } catch (error) {
     console.error(error);
