@@ -98,8 +98,8 @@ export async function createTopics(brokerString, topicConfig) {
 export async function deleteTopics(brokerString, topicList) {
   // Check that each topic in the list is something we can delete
   for (var topic of topicList) {
-    if (!topic.match(/^--.*--.*--/g)) {
-      throw "ERROR:  The deleteTopics function only operates against topics that match ^--.*--.*--";
+    if (!topic.match(/.*--.*--.*--.*/g)) {
+      throw "ERROR:  The deleteTopics function only operates against topics that match /.*--.*--.*--.*/g";
     }
   }
 
@@ -115,8 +115,18 @@ export async function deleteTopics(brokerString, topicList) {
 
   await admin.connect();
 
-  console.log(`Deleting topics:  ${topicList}`);
-  await admin.deleteTopics({
-    topics: topicList,
+  const currentTopics = await admin.listTopics();
+
+  let topicsToDelete = _.filter(currentTopics, function (currentTopic) {
+    return topicList.some((pattern) => {
+      return !!currentTopic.match(pattern);
+    });
   });
+
+  console.log(`Deleting topics:  ${topicsToDelete}`);
+  await admin.deleteTopics({
+    topics: topicsToDelete,
+  });
+
+  await admin.disconnect();
 }

@@ -7,22 +7,23 @@ exports.handler = async function (event, context) {
   let responseStatus = SUCCESS;
   try {
     const BrokerString = event.ResourceProperties.BrokerString;
-    const TopicsToDelete = event.ResourceProperties.TopicsToDelete;
+    const TopicPatternsToDelete =
+      event.ResourceProperties.TopicPatternsToDelete;
     if (event.RequestType === "Create" || event.RequestType == "Update") {
       console.log("This resource does nothing on Create and Update events.");
     } else if (event.RequestType === "Delete") {
       if (
-        !TopicsToDelete.every((expression) => {
-          expression.match(/.*--.*--.*--.*/g);
+        TopicPatternsToDelete.every((expression) => {
+          return !!expression.match(/.*--.*--.*--.*/g); // The !! converts to a boolean; true if match is found
         })
       ) {
+        await topics.deleteTopics(BrokerString, TopicPatternsToDelete);
+      } else {
         console.log(`
         WARNING:  Only patterns that include a namespace qualifier can be deleted; they must match /.*--.*--.*--.*/g
         You have passed at least one pattern that does not match this pattern.
         This resource will do nothing.
         `);
-      } else {
-        await topics.deleteTopics(BrokerString, TopicsToDelete);
       }
     }
   } catch (error) {

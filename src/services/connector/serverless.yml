@@ -199,8 +199,8 @@ resources:
       Properties:
         ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
-        TopicsToDelete:
-          - ${param:topicNamespace}aws.seatool.cmcs.dbo.*
+        TopicPatternsToDelete:
+          - ${param:topicNamespace}aws.seatool.cmcs*
           - ${param:topicNamespace}mgmt.connect.${self:service}*
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
