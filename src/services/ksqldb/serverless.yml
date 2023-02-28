@@ -253,8 +253,11 @@ resources:
         Cpu: ${param:cpu}
         EphemeralStorage: 200
       DependsOn:
-        - CleanupAggTldTopics
         - CleanupKsqldbServiceTopics
+        - Fn::If:
+          - Dev
+          - AWS::NoValue
+          - CleanupAggTldTopics
 
     ksqldbHeadlessCluster:
       Type: "AWS::ECS::Cluster"
@@ -379,8 +382,11 @@ resources:
         Cpu: 2048
         EphemeralStorage: 50
       DependsOn:
-        - CleanupAggTldTopics
         - CleanupKsqldbServiceTopics
+        - Fn::If:
+          - Dev
+          - AWS::NoValue
+          - CleanupAggTldTopics
 
     ksqldbIntService:
       Type: "AWS::ECS::Service"
