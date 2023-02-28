@@ -144,9 +144,10 @@ functions:
 resources:
   Conditions:
     Dev:
-      Fn::Equals:
-        - ${param:topicNamespace}
-        - ""
+      Fn::Not: 
+        Fn::Equals:
+          - ${param:topicNamespace}
+          - ""
   Resources:
     CreateTopics:
       Type: AWS::CloudFormation::CustomResource
