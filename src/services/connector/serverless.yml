@@ -141,6 +141,11 @@ functions:
         ${self:custom.vpc.privateSubnets}
 
 resources:
+  Conditions:
+    Dev:
+      Fn::Equals:
+        - ${param:topicNamespace}
+        - ""
   Resources:
     CreateTopics:
       Type: Custom::CreateTopics
@@ -192,13 +197,20 @@ resources:
           - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Type
           - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_Types
           - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_SubTypes
-    CleanupKafka:
-      Type: Custom::CleanupKafka
+    CleanupDataTopics:
+      Type: AWS::CloudFormation::CustomResource
+      Condition: Dev # We only clean up application data topics in lower environments where Dev is true
       Properties:
         ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
         TopicPatternsToDelete:
           - ${param:topicNamespace}aws.seatool.cmcs*
+    CleanupConnectorTopics:
+      Type: AWS::CloudFormation::CustomResource
+      Properties:
+        ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
+        BrokerString: ${self:custom.brokerString}
+        TopicPatternsToDelete:
           - ${param:topicNamespace}mgmt.connect.${self:service}*
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
