@@ -254,10 +254,6 @@ resources:
         EphemeralStorage: 200
       DependsOn:
         - CleanupKsqldbServiceTopics
-        - Fn::If:
-          - Dev
-          - Ref: AWS::NoValue
-          - CleanupAggTldTopics
 
     ksqldbHeadlessCluster:
       Type: "AWS::ECS::Cluster"
@@ -383,10 +379,6 @@ resources:
         EphemeralStorage: 50
       DependsOn:
         - CleanupKsqldbServiceTopics
-        - Fn::If:
-          - Dev
-          - Ref: AWS::NoValue
-          - CleanupAggTldTopics
 
     ksqldbIntService:
       Type: "AWS::ECS::Service"
@@ -424,6 +416,11 @@ resources:
         TopicPatternsToDelete:
           - _confluent-ksql-${param:topicNamespace}${self:service}-*
           - ${param:topicNamespace}${self:service}-*ksql_processing_log
+        ConditionalDependency: 
+          Fn::If:
+            - Dev
+            - !Ref CleanupAggTldTopics
+            - Blank
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
