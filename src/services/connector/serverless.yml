@@ -144,7 +144,7 @@ functions:
 resources:
   Conditions:
     Dev:
-      Fn::Not: 
+      Fn::Not:
         Fn::Equals:
           - ${param:topicNamespace}
           - ""

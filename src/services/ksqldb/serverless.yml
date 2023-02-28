@@ -101,7 +101,7 @@ functions:
 resources:
   Conditions:
     Dev:
-      Fn::Not: 
+      Fn::Not:
         Fn::Equals:
           - ${param:topicNamespace}
           - ""
@@ -417,7 +417,7 @@ resources:
         TopicPatternsToDelete:
           - _confluent-ksql-${param:topicNamespace}${self:service}-*
           - ${param:topicNamespace}${self:service}-*ksql_processing_log
-        ConditionalDependency: 
+        ConditionalDependency:
           Fn::If:
             - Dev
             - !Ref CleanupAggTldTopics
