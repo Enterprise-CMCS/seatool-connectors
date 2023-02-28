@@ -402,7 +402,7 @@ resources:
             Subnets: >-
               ${self:custom.vpc.privateSubnets}
     CleanupAggTldTopics:
-      Type: AWS::CloudFormation::CustomResource
+      Type: Custom::CleanupAggTldTopics
       Condition: Dev # We only clean up these agg/tld data topics in lower environments where Dev is true
       Properties:
         ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
@@ -411,7 +411,7 @@ resources:
           - ${param:topicNamespace}aws.ksqldb.seatool.agg*
           - ${param:topicNamespace}aws.ksqldb.seatool.tld*
     CleanupKsqldbServiceTopics:
-      Type: AWS::CloudFormation::CustomResource
+      Type: Custom::CleanupKsqldbServiceTopics
       Properties:
         ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
