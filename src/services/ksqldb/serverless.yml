@@ -253,7 +253,8 @@ resources:
         Cpu: ${param:cpu}
         EphemeralStorage: 200
       DependsOn:
-        - CleanupKafka
+        - CleanupAggTldTopics
+        - CleanupKsqldbServiceTopics
 
     ksqldbHeadlessCluster:
       Type: "AWS::ECS::Cluster"
@@ -378,7 +379,8 @@ resources:
         Cpu: 2048
         EphemeralStorage: 50
       DependsOn:
-        - CleanupKafka
+        - CleanupAggTldTopics
+        - CleanupKsqldbServiceTopics
 
     ksqldbIntService:
       Type: "AWS::ECS::Service"
@@ -399,15 +401,23 @@ resources:
               - !Ref ksqldbSecurityGroup
             Subnets: >-
               ${self:custom.vpc.privateSubnets}
-    CleanupKafka:
-      Type: Custom::CleanupKafka
+    CleanupAggTldTopics:
+      Type: AWS::CloudFormation::CustomResource
+      Condition: Dev # We only clean up these agg/tld data topics in lower environments where Dev is true
       Properties:
         ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
         TopicPatternsToDelete:
-          - ${param:topicNamespace}aws.ksqldb*
-          - ${param:topicNamespace}${self:service}-*
+          - ${param:topicNamespace}aws.ksqldb.seatool.agg*
+          - ${param:topicNamespace}aws.ksqldb.seatool.tld*
+    CleanupKsqldbServiceTopics:
+      Type: AWS::CloudFormation::CustomResource
+      Properties:
+        ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
+        BrokerString: ${self:custom.brokerString}
+        TopicPatternsToDelete:
           - _confluent-ksql-${param:topicNamespace}${self:service}-*
+          - ${param:topicNamespace}${self:service}-*ksql_processing_log
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:

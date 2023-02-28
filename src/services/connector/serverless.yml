@@ -149,7 +149,7 @@ resources:
         - ""
   Resources:
     CreateTopics:
-      Type: Custom::CreateTopics
+      Type: AWS::CloudFormation::CustomResource
       Properties:
         ServiceToken: !GetAtt CreateTopicsLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
