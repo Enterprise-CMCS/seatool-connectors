@@ -256,7 +256,7 @@ resources:
         - CleanupKsqldbServiceTopics
         - Fn::If:
           - Dev
-          - AWS::NoValue
+          - Ref: AWS::NoValue
           - CleanupAggTldTopics
 
     ksqldbHeadlessCluster:
@@ -385,7 +385,7 @@ resources:
         - CleanupKsqldbServiceTopics
         - Fn::If:
           - Dev
-          - AWS::NoValue
+          - Ref: AWS::NoValue
           - CleanupAggTldTopics
 
     ksqldbIntService:
