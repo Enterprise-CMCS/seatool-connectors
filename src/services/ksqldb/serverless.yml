@@ -416,7 +416,7 @@ resources:
         BrokerString: ${self:custom.brokerString}
         TopicPatternsToDelete:
           - _confluent-ksql-${param:topicNamespace}${self:service}-*
-          - ${param:topicNamespace}${self:service}-*ksql_processing_log
+          - ${param:topicNamespace}${self:service}*
         ConditionalDependency:
           Fn::If:
             - Dev
