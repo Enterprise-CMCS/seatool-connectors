@@ -368,6 +368,8 @@ resources:
           - FARGATE
         Memory: 4GB
         Cpu: 2048
+      DependsOn:
+        - CleanupConnectorTopics # Ensures mgmt topics are not removed before the task is down.
     KafkaConnectCluster:
       Type: "AWS::ECS::Cluster"
       Properties:
