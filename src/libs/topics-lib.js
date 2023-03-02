@@ -1,8 +1,8 @@
 const _ = require("lodash");
 import { Kafka, ResourceTypes } from "kafkajs";
 
-export async function createTopics(brokerString, topicConfig) {
-  const topics = topicConfig;
+export async function createTopics(brokerString, topicsConfig) {
+  const topics = topicsConfig;
   const brokers = brokerString.split(",");
 
   const kafka = new Kafka({
