@@ -60,8 +60,6 @@ custom:
         done
 
 params:
-  magnolia:
-    topicNamespace: ""
   master:
     topicNamespace: ""
   val:
