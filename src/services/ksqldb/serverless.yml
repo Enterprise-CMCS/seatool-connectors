@@ -102,8 +102,8 @@ resources:
     Dev:
       Fn::Not:
         - Fn::Equals:
-          - ${param:topicNamespace}
-          - ""
+            - ${param:topicNamespace}
+            - ""
   Resources:
     ksqldbHeadlessLogGroup:
       Type: "AWS::Logs::LogGroup"
