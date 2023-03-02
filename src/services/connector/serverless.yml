@@ -198,6 +198,7 @@ resources:
           - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Type
           - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_Types
           - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_SubTypes
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_SubTypesMIKETEST
     CleanupDataTopics:
       Type: AWS::CloudFormation::CustomResource
       Condition: Dev # We only clean up application data topics in lower environments where Dev is true
