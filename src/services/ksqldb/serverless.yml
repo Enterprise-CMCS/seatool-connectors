@@ -252,8 +252,13 @@ resources:
         Memory: ${param:memory}
         Cpu: ${param:cpu}
         EphemeralStorage: 200
-      DependsOn:
-        - CleanupKsqldbServiceTopics
+        Tags:
+          - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
+            Value: 
+              Fn::If:
+                - Dev
+                - !Ref CleanupTopics
+                - Blank
 
     ksqldbHeadlessCluster:
       Type: "AWS::ECS::Cluster"
@@ -377,8 +382,13 @@ resources:
         Memory: 4096
         Cpu: 2048
         EphemeralStorage: 50
-      DependsOn:
-        - CleanupKsqldbServiceTopics
+        Tags:
+          - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
+            Value: 
+              Fn::If:
+                - Dev
+                - !Ref CleanupTopics
+                - Blank
 
     ksqldbIntService:
       Type: "AWS::ECS::Service"
@@ -399,7 +409,7 @@ resources:
               - !Ref ksqldbSecurityGroup
             Subnets: >-
               ${self:custom.vpc.privateSubnets}
-    CleanupAggTldTopics:
+    CleanupTopics:
       Type: AWS::CloudFormation::CustomResource
       Condition: Dev # We only clean up these agg/tld data topics in lower environments where Dev is true
       Properties:
@@ -408,19 +418,8 @@ resources:
         TopicPatternsToDelete:
           - ${param:topicNamespace}aws.ksqldb.seatool.agg*
           - ${param:topicNamespace}aws.ksqldb.seatool.tld*
-    CleanupKsqldbServiceTopics:
-      Type: AWS::CloudFormation::CustomResource
-      Properties:
-        ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
-        BrokerString: ${self:custom.brokerString}
-        TopicPatternsToDelete:
           - _confluent-ksql-${param:topicNamespace}${self:service}-*
           - ${param:topicNamespace}${self:service}*
-        ConditionalDependency:
-          Fn::If:
-            - Dev
-            - !Ref CleanupAggTldTopics
-            - Blank
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
