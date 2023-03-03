@@ -364,7 +364,7 @@ resources:
         Cpu: 2048
         Tags:
           - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
-            Value: 
+            Value:
               Fn::If:
                 - Dev
                 - !Ref CleanupTopics

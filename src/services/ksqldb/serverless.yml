@@ -254,7 +254,7 @@ resources:
         EphemeralStorage: 200
         Tags:
           - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
-            Value: 
+            Value:
               Fn::If:
                 - Dev
                 - !Ref CleanupTopics
@@ -384,7 +384,7 @@ resources:
         EphemeralStorage: 50
         Tags:
           - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
-            Value: 
+            Value:
               Fn::If:
                 - Dev
                 - !Ref CleanupTopics
