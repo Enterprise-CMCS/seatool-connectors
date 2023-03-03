@@ -142,7 +142,7 @@ functions:
 
 resources:
   Conditions:
-    Dev:
+    isDev:
       Fn::Not:
         - Fn::Equals:
             - ${param:topicNamespace}
@@ -200,7 +200,7 @@ resources:
           - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_SubTypes
     CleanupTopics:
       Type: AWS::CloudFormation::CustomResource
-      Condition: Dev # We only clean up application data topics in lower environments where Dev is true
+      Condition: isDev # We only clean up topics in lower environments where isDev is true
       Properties:
         ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
@@ -365,7 +365,7 @@ resources:
           - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
             Value:
               Fn::If:
-                - Dev
+                - isDev
                 - !Ref CleanupTopics
                 - Blank
     KafkaConnectCluster:
