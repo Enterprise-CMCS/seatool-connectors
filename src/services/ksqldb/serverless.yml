@@ -15,15 +15,15 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x
   region: ${env:REGION_A}
   stackTags:
     PROJECT: ${self:custom.project}
     SERVICE: ${self:service}
   iam:
     role:
-      path: ${ssm:/configuration/${sls:stage}/iam/path, ssm:/configuration/default/iam/path, "/"}
-      permissionsBoundary: ${ssm:/configuration/${sls:stage}/iam/permissionsBoundaryPolicyArn, ssm:/configuration/default/iam/permissionsBoundaryPolicyArn, ""}
+      path: /delegatedadmin/developer/
+      permissionsBoundary: arn:aws:iam::${aws:accountId}:policy/cms-cloud-admin/developer-boundary-policy
 
 custom:
   project: ${env:PROJECT}
@@ -88,8 +88,22 @@ functions:
     handler: handlers/dummy.myHandler
     layers:
       - !Ref DummyLambdaLayer
+  cleanupKafka:
+    handler: handlers/cleanupKafka.handler
+    vpc:
+      securityGroupIds:
+        - Ref: LambdaSecurityGroup
+      subnetIds: >-
+        ${self:custom.vpc.privateSubnets}
+    timeout: 300
 
 resources:
+  Conditions:
+    isDev:
+      Fn::Not:
+        - Fn::Equals:
+            - ${param:topicNamespace}
+            - ""
   Resources:
     ksqldbHeadlessLogGroup:
       Type: "AWS::Logs::LogGroup"
@@ -100,14 +114,20 @@ resources:
       Properties:
         GroupDescription: Security Group for the Fargate
         VpcId: ${self:custom.vpc.id}
+    ksqldbSecurityGroupEgress:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref ksqldbSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
     ksqldbSecurityGroupIngressCluster:
       Type: AWS::EC2::SecurityGroupIngress
       Properties:
-        GroupId: !Sub "${ksqldbSecurityGroup}"
+        GroupId: !Ref ksqldbSecurityGroup
         IpProtocol: tcp
         FromPort: 8088
         ToPort: 8088
-        SourceSecurityGroupId: !Sub "${ksqldbSecurityGroup}"
+        SourceSecurityGroupId: !Ref ksqldbSecurityGroup
     ksqldbHeadlessRole:
       Type: "AWS::IAM::Role"
       Properties:
@@ -219,8 +239,8 @@ resources:
             LogConfiguration:
               LogDriver: awslogs
               Options:
-                awslogs-region: !Sub "${AWS::Region}"
-                awslogs-group: !Sub "${ksqldbHeadlessLogGroup}"
+                awslogs-region: !Ref AWS::Region
+                awslogs-group: !Ref ksqldbHeadlessLogGroup
                 awslogs-stream-prefix: fargate
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
         Family: ${self:service}-${sls:stage}-ksqldb-headless
@@ -232,6 +252,13 @@ resources:
         Memory: ${param:memory}
         Cpu: ${param:cpu}
         EphemeralStorage: 200
+        Tags:
+          - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
+            Value:
+              Fn::If:
+                - isDev
+                - !Ref CleanupTopics
+                - Blank
 
     ksqldbHeadlessCluster:
       Type: "AWS::ECS::Cluster"
@@ -241,7 +268,7 @@ resources:
     ksqldbHeadlessService:
       Type: "AWS::ECS::Service"
       Properties:
-        Cluster: !Sub "${ksqldbHeadlessCluster}"
+        Cluster: !Ref ksqldbHeadlessCluster
         DeploymentConfiguration:
           DeploymentCircuitBreaker:
             Enable: true
@@ -252,12 +279,12 @@ resources:
         LaunchType: FARGATE
         ServiceName: ksqldb-headless
         DesiredCount: 1
-        TaskDefinition: !Sub "${ksqldbHeadlessTaskDefinition}"
+        TaskDefinition: !Ref ksqldbHeadlessTaskDefinition
         NetworkConfiguration:
           AwsvpcConfiguration:
             AssignPublicIp: DISABLED
             SecurityGroups:
-              - !Sub "${ksqldbSecurityGroup}"
+              - !Ref ksqldbSecurityGroup
             Subnets: >-
               ${self:custom.vpc.privateSubnets}
     ECSFailureEventRule:
@@ -266,7 +293,7 @@ resources:
         Description: "ksqlDB Cluster Task Failure Event Rule"
         EventPattern:
           account:
-            - !Sub "${AWS::AccountId}"
+            - !Ref AWS::AccountId
           source:
             - "aws.ecs"
             - "demo.cli" # used to test events from the command line
@@ -342,8 +369,8 @@ resources:
             LogConfiguration:
               LogDriver: awslogs
               Options:
-                awslogs-region: !Sub "${AWS::Region}"
-                awslogs-group: !Sub "${ksqldbIntLogGroup}"
+                awslogs-region: !Ref AWS::Region
+                awslogs-group: !Ref ksqldbIntLogGroup
                 awslogs-stream-prefix: fargate
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
         Family: ${self:service}-${sls:stage}-ksqldbInt
@@ -355,22 +382,52 @@ resources:
         Memory: 4096
         Cpu: 2048
         EphemeralStorage: 50
+        Tags:
+          - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
+            Value:
+              Fn::If:
+                - isDev
+                - !Ref CleanupTopics
+                - Blank
+
     ksqldbIntService:
       Type: "AWS::ECS::Service"
       Properties:
-        Cluster: !Sub "${ksqldbHeadlessCluster}"
+        Cluster: !Ref ksqldbHeadlessCluster
         DeploymentConfiguration:
           MaximumPercent: 100
           MinimumHealthyPercent: 0
         LaunchType: FARGATE
         ServiceName: ksqldb-interactive
         DesiredCount: 0
-        TaskDefinition: !Sub "${ksqldbIntTaskDefinition}"
+        TaskDefinition: !Ref ksqldbIntTaskDefinition
         EnableExecuteCommand: true
         NetworkConfiguration:
           AwsvpcConfiguration:
             AssignPublicIp: DISABLED
             SecurityGroups:
-              - !Sub "${ksqldbSecurityGroup}"
+              - !Ref ksqldbSecurityGroup
             Subnets: >-
               ${self:custom.vpc.privateSubnets}
+    CleanupTopics:
+      Type: AWS::CloudFormation::CustomResource
+      Condition: isDev # We only clean up topics in lower environments where isDev is true
+      Properties:
+        ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
+        BrokerString: ${self:custom.brokerString}
+        TopicPatternsToDelete:
+          - ${param:topicNamespace}aws.ksqldb.seatool.agg*
+          - ${param:topicNamespace}aws.ksqldb.seatool.tld*
+          - _confluent-ksql-${param:topicNamespace}${self:service}-*
+          - ${param:topicNamespace}${self:service}*
+    LambdaSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Security Group for the topics lambda function
+        VpcId: ${self:custom.vpc.id}
+    LambdaSecurityGroupEgress:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref LambdaSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0

@@ -2,6 +2,8 @@
   "name": "ksqldb",
   "version": "1.0.0",
   "description": "",
-  "dependencies": {},
+  "dependencies": {
+    "cfn-response-async": "^1.0.0"
+  },
   "devDependencies": {}
 }

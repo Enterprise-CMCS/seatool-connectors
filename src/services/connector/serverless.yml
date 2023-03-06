@@ -16,15 +16,15 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x
   region: ${env:REGION_A}
   stackTags:
     PROJECT: ${self:custom.project}
     SERVICE: ${self:service}
   iam:
     role:
-      path: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/iam/path, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/iam/path}
-      permissionsBoundary: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/iam/permissionsBoundary, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/iam/permissionsBoundary}
+      path: /delegatedadmin/developer/
+      permissionsBoundary: arn:aws:iam::${aws:accountId}:policy/cms-cloud-admin/developer-boundary-policy
       statements:
         - Effect: "Allow"
           Action:
@@ -91,6 +91,22 @@ params:
     topicNamespace: --${self:custom.project}--${sls:stage}--
 
 functions:
+  createTopics:
+    handler: handlers/createTopics.handler
+    vpc:
+      securityGroupIds:
+        - Ref: LambdaSecurityGroup
+      subnetIds: >-
+        ${self:custom.vpc.privateSubnets}
+    timeout: 300
+  cleanupKafka:
+    handler: handlers/cleanupKafka.handler
+    vpc:
+      securityGroupIds:
+        - Ref: LambdaSecurityGroup
+      subnetIds: >-
+        ${self:custom.vpc.privateSubnets}
+    timeout: 300
   configureConnectors:
     handler: handlers/configureConnectors.handler
     environment:
@@ -125,7 +141,83 @@ functions:
         ${self:custom.vpc.privateSubnets}
 
 resources:
+  Conditions:
+    isDev:
+      Fn::Not:
+        - Fn::Equals:
+            - ${param:topicNamespace}
+            - ""
   Resources:
+    CreateTopics:
+      Type: AWS::CloudFormation::CustomResource
+      Properties:
+        ServiceToken: !GetAtt CreateTopicsLambdaFunction.Arn
+        BrokerString: ${self:custom.brokerString}
+        TopicsToCreate:
+          - name: ${param:topicNamespace}aws.seatool.cmcs
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbHistory
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Action_Officers
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Action_Types
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.aspnet_Users
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Call_Held_Reasons
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Code_After_Init_Assess
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Column_Definition
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Components_StatePlans
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Components
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Early_Alert_Field_Types
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Early_Alert_Fields
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Email
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.EmailDistribution
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Holiday
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.OCD_Review
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Officers
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Plan_Types
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Position
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Priority_Codes
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Priority_Complexity
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Priority_Review_Position
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.RAI
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Region_Access
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Region
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.SPA_Type
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.SPW_Status
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_1115_State_PN
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_1115_TE
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_1115
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_APD_Sub_Type
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_APD
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Early_Alerts
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Impact_Funding
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.States_Officer_Represents
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.States
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Stop_Resume_Dates
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Sub_Type
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Table_Definition
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Title_Type
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Type
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_Types
+          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_SubTypes
+    CleanupTopics:
+      Type: AWS::CloudFormation::CustomResource
+      Condition: isDev # We only clean up topics in lower environments where isDev is true
+      Properties:
+        ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
+        BrokerString: ${self:custom.brokerString}
+        TopicPatternsToDelete:
+          - ${param:topicNamespace}aws.seatool.cmcs*
+          - ${param:topicNamespace}mgmt.connect.${self:service}*
+    LambdaSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Security Group for the topics lambda function
+        VpcId: ${self:custom.vpc.id}
+    LambdaSecurityGroupEgress:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref LambdaSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
     KafkaConnectWorkerLogGroup:
       Type: "AWS::Logs::LogGroup"
       Properties:
@@ -135,22 +227,28 @@ resources:
       Properties:
         GroupDescription: Security Group for the Fargate Connect Workers.
         VpcId: ${self:custom.vpc.id}
+    KafkaConnectWorkerSecurityGroupEgressLambda:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref KafkaConnectWorkerSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
     KafkaConnectWorkerSecurityGroupIngressLambda:
       Type: AWS::EC2::SecurityGroupIngress
       Properties:
-        GroupId: !Sub "${KafkaConnectWorkerSecurityGroup}"
+        GroupId: !Ref KafkaConnectWorkerSecurityGroup
         IpProtocol: tcp
         FromPort: 8083
         ToPort: 8083
-        SourceSecurityGroupId: !Sub "${LambdaConfigureConnectorsSecurityGroup}"
+        SourceSecurityGroupId: !Ref LambdaConfigureConnectorsSecurityGroup
     KafkaConnectWorkerSecurityGroupIngressCluster:
       Type: AWS::EC2::SecurityGroupIngress
       Properties:
-        GroupId: !Sub "${KafkaConnectWorkerSecurityGroup}"
+        GroupId: !Ref KafkaConnectWorkerSecurityGroup
         IpProtocol: tcp
         FromPort: 8083
         ToPort: 8083
-        SourceSecurityGroupId: !Sub "${KafkaConnectWorkerSecurityGroup}"
+        SourceSecurityGroupId: !Ref KafkaConnectWorkerSecurityGroup
     KafkaConnectWorkerRole:
       Type: "AWS::IAM::Role"
       Properties:
@@ -181,6 +279,7 @@ resources:
                   Action:
                     - ecr:BatchGetImage
                   Resource: !Sub "arn:aws:ecr:${self:provider.region}:${AWS::AccountId}:repository/*"
+
     KafkaConnectWorkerTaskDefinition:
       Type: "AWS::ECS::TaskDefinition"
       Properties:
@@ -242,8 +341,8 @@ resources:
             LogConfiguration:
               LogDriver: awslogs
               Options:
-                awslogs-region: !Sub "${AWS::Region}"
-                awslogs-group: !Sub "${KafkaConnectWorkerLogGroup}"
+                awslogs-region: !Ref AWS::Region
+                awslogs-group: !Ref KafkaConnectWorkerLogGroup
                 awslogs-stream-prefix: fargate
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
           - Name: instantclient
@@ -262,6 +361,13 @@ resources:
           - FARGATE
         Memory: 4GB
         Cpu: 2048
+        Tags:
+          - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
+            Value:
+              Fn::If:
+                - isDev
+                - !Ref CleanupTopics
+                - Blank
     KafkaConnectCluster:
       Type: "AWS::ECS::Cluster"
       Properties:
@@ -270,7 +376,7 @@ resources:
     KafkaConnectService:
       Type: "AWS::ECS::Service"
       Properties:
-        Cluster: !Sub "${KafkaConnectCluster}"
+        Cluster: !Ref KafkaConnectCluster
         DeploymentConfiguration:
           DeploymentCircuitBreaker:
             Enable: true
@@ -281,12 +387,12 @@ resources:
         LaunchType: FARGATE
         ServiceName: kafka-connect
         DesiredCount: 1
-        TaskDefinition: !Sub "${KafkaConnectWorkerTaskDefinition}"
+        TaskDefinition: !Ref KafkaConnectWorkerTaskDefinition
         NetworkConfiguration:
           AwsvpcConfiguration:
             AssignPublicIp: DISABLED
             SecurityGroups:
-              - !Sub "${KafkaConnectWorkerSecurityGroup}"
+              - !Ref KafkaConnectWorkerSecurityGroup
             Subnets: >-
               ${self:custom.vpc.dataSubnets}
     ECSFailureEventRule:
@@ -295,7 +401,7 @@ resources:
         Description: "Connector Task Failure Event Rule"
         EventPattern:
           account:
-            - !Sub "${AWS::AccountId}"
+            - !Ref AWS::AccountId
           source:
             - "aws.ecs"
             - "demo.cli" # used to test events from the command line
@@ -351,6 +457,12 @@ resources:
       Properties:
         GroupDescription: Security Group for configuring the connector.
         VpcId: ${self:custom.vpc.id}
+    LambdaConfigureConnectorsSecurityGroupEgress:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref LambdaConfigureConnectorsSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
     ConnectorLogsErrorCount:
       Type: AWS::Logs::MetricFilter
       Properties:
