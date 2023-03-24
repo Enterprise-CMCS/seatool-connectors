@@ -488,7 +488,7 @@ resources:
       Type: AWS::CloudWatch::Alarm
       Properties:
         AlarmName: ${self:service}-${sls:stage}-ksqldbIntService-MemoryUtilization
-        AlarmDescription: "Trigger an alarm when the Memory utilization reaches 75%"
+        AlarmDescription: Trigger an alarm when the Memory utilization reaches 75%
         Namespace: AWS/ECS
         MetricName: MemoryUtilization
         Dimensions:
@@ -500,7 +500,7 @@ resources:
         Period: 60
         EvaluationPeriods: 2
         Threshold: 75
-        ComparisonOperator: "GreaterThanOrEqualToThreshold"
+        ComparisonOperator: GreaterThanOrEqualToThreshold
         AlarmActions:
           - ${param:ecsFailureTopicArn}
         OKActions:
