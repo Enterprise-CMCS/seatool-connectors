@@ -427,24 +427,17 @@ resources:
         AlarmName: ${self:service}-${sls:stage}-ksqldbHeadlessService-CPUUtilization
         AlarmDescription: "Trigger an alarm when the CPU utilization reaches 75%"
         Namespace: AWS/ECS
-        MetricName: "CPUUtilization"
+        MetricName: CPUUtilization
         Dimensions:
           - Name: ClusterName
             Value: !Ref ksqldbHeadlessCluster
           - Name: ServiceName
-            Value:
-              !Select [
-                2,
-                !Split [
-                  "/",
-                  !Select [5, !Split [":", !Ref ksqldbHeadlessService]],
-                ],
-              ]
-        Statistic: "Average"
-        Period: "300"
-        EvaluationPeriods: "2"
-        Threshold: "75"
-        ComparisonOperator: "GreaterThanOrEqualToThreshold"
+            Value: !GetAtt ksqldbHeadlessService.Name
+        Statistic: Average
+        Period: 60
+        EvaluationPeriods: 2
+        Threshold: 75
+        ComparisonOperator: GreaterThanOrEqualToThreshold
         AlarmActions:
           - ${param:ecsFailureTopicArn}
         OKActions:
@@ -455,24 +448,17 @@ resources:
         AlarmName: ${self:service}-${sls:stage}-ksqldbHeadlessService-MemoryUtilization
         AlarmDescription: "Trigger an alarm when the Memory utilization reaches 75%"
         Namespace: AWS/ECS
-        MetricName: "MemoryUtilization"
+        MetricName: MemoryUtilization
         Dimensions:
           - Name: ClusterName
             Value: !Ref ksqldbHeadlessCluster
           - Name: ServiceName
-            Value:
-              !Select [
-                2,
-                !Split [
-                  "/",
-                  !Select [5, !Split [":", !Ref ksqldbHeadlessService]],
-                ],
-              ]
-        Statistic: "Average"
-        Period: "300"
-        EvaluationPeriods: "2"
-        Threshold: "75"
-        ComparisonOperator: "GreaterThanOrEqualToThreshold"
+            Value: !GetAtt ksqldbHeadlessService.Name
+        Statistic: Average
+        Period: 60
+        EvaluationPeriods: 2
+        Threshold: 75
+        ComparisonOperator: GreaterThanOrEqualToThreshold
         AlarmActions:
           - ${param:ecsFailureTopicArn}
         OKActions:
@@ -483,21 +469,17 @@ resources:
         AlarmName: ${self:service}-${sls:stage}-ksqldbIntService-CPUUtilization
         AlarmDescription: "Trigger an alarm when the CPU utilization reaches 75%"
         Namespace: AWS/ECS
-        MetricName: "CPUUtilization"
+        MetricName: CPUUtilization
         Dimensions:
           - Name: ClusterName
             Value: !Ref ksqldbHeadlessCluster
           - Name: ServiceName
-            Value:
-              !Select [
-                2,
-                !Split ["/", !Select [5, !Split [":", !Ref ksqldbIntService]]],
-              ]
-        Statistic: "Average"
-        Period: "300"
-        EvaluationPeriods: "2"
-        Threshold: "75"
-        ComparisonOperator: "GreaterThanOrEqualToThreshold"
+            Value: !GetAtt ksqldbIntService.Name
+        Statistic: Average
+        Period: 60
+        EvaluationPeriods: 2
+        Threshold: 75
+        ComparisonOperator: GreaterThanOrEqualToThreshold
         AlarmActions:
           - ${param:ecsFailureTopicArn}
         OKActions:
@@ -508,20 +490,16 @@ resources:
         AlarmName: ${self:service}-${sls:stage}-ksqldbIntService-MemoryUtilization
         AlarmDescription: "Trigger an alarm when the Memory utilization reaches 75%"
         Namespace: AWS/ECS
-        MetricName: "MemoryUtilization"
+        MetricName: MemoryUtilization
         Dimensions:
           - Name: ClusterName
             Value: !Ref ksqldbHeadlessCluster
           - Name: ServiceName
-            Value:
-              !Select [
-                2,
-                !Split ["/", !Select [5, !Split [":", !Ref ksqldbIntService]]],
-              ]
-        Statistic: "Average"
-        Period: "300"
-        EvaluationPeriods: "2"
-        Threshold: "75"
+            Value: !GetAtt ksqldbIntService.Name
+        Statistic: Average
+        Period: 60
+        EvaluationPeriods: 2
+        Threshold: 75
         ComparisonOperator: "GreaterThanOrEqualToThreshold"
         AlarmActions:
           - ${param:ecsFailureTopicArn}
