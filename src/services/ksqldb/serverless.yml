@@ -420,6 +420,113 @@ resources:
           - ${param:topicNamespace}aws.ksqldb.seatool.tld*
           - _confluent-ksql-${param:topicNamespace}${self:service}-*
           - ${param:topicNamespace}${self:service}*
+
+    ksqldbHeadlessServiceECSCpuAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${sls:stage}-ksqldbHeadlessService-CPUUtilization
+        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 75%"
+        Namespace: AWS/ECS
+        MetricName: "CPUUtilization"
+        Dimensions:
+          - Name: ClusterName
+            Value: !Ref ksqldbHeadlessCluster
+          - Name: ServiceName
+            Value:
+              !Select [
+                2,
+                !Split [
+                  "/",
+                  !Select [5, !Split [":", !Ref ksqldbHeadlessService]],
+                ],
+              ]
+        Statistic: "Average"
+        Period: "300"
+        EvaluationPeriods: "2"
+        Threshold: "75"
+        ComparisonOperator: "GreaterThanOrEqualToThreshold"
+        AlarmActions:
+          - ${param:ecsFailureTopicArn}
+        OKActions:
+          - ${param:ecsFailureTopicArn}
+    ksqldbHeadlessServiceECSMemoryAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${sls:stage}-ksqldbHeadlessService-MemoryUtilization
+        AlarmDescription: "Trigger an alarm when the Memory utilization reaches 75%"
+        Namespace: AWS/ECS
+        MetricName: "MemoryUtilization"
+        Dimensions:
+          - Name: ClusterName
+            Value: !Ref ksqldbHeadlessCluster
+          - Name: ServiceName
+            Value:
+              !Select [
+                2,
+                !Split [
+                  "/",
+                  !Select [5, !Split [":", !Ref ksqldbHeadlessService]],
+                ],
+              ]
+        Statistic: "Average"
+        Period: "300"
+        EvaluationPeriods: "2"
+        Threshold: "75"
+        ComparisonOperator: "GreaterThanOrEqualToThreshold"
+        AlarmActions:
+          - ${param:ecsFailureTopicArn}
+        OKActions:
+          - ${param:ecsFailureTopicArn}
+    ksqldbIntServiceECSCpuAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${sls:stage}-ksqldbIntService-CPUUtilization
+        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 75%"
+        Namespace: AWS/ECS
+        MetricName: "CPUUtilization"
+        Dimensions:
+          - Name: ClusterName
+            Value: !Ref ksqldbHeadlessCluster
+          - Name: ServiceName
+            Value:
+              !Select [
+                2,
+                !Split ["/", !Select [5, !Split [":", !Ref ksqldbIntService]]],
+              ]
+        Statistic: "Average"
+        Period: "300"
+        EvaluationPeriods: "2"
+        Threshold: "75"
+        ComparisonOperator: "GreaterThanOrEqualToThreshold"
+        AlarmActions:
+          - ${param:ecsFailureTopicArn}
+        OKActions:
+          - ${param:ecsFailureTopicArn}
+    ksqldbIntServiceECSMemoryAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${sls:stage}-ksqldbIntService-MemoryUtilization
+        AlarmDescription: "Trigger an alarm when the Memory utilization reaches 75%"
+        Namespace: AWS/ECS
+        MetricName: "MemoryUtilization"
+        Dimensions:
+          - Name: ClusterName
+            Value: !Ref ksqldbHeadlessCluster
+          - Name: ServiceName
+            Value:
+              !Select [
+                2,
+                !Split ["/", !Select [5, !Split [":", !Ref ksqldbIntService]]],
+              ]
+        Statistic: "Average"
+        Period: "300"
+        EvaluationPeriods: "2"
+        Threshold: "75"
+        ComparisonOperator: "GreaterThanOrEqualToThreshold"
+        AlarmActions:
+          - ${param:ecsFailureTopicArn}
+        OKActions:
+          - ${param:ecsFailureTopicArn}
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:

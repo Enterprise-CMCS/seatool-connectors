@@ -520,7 +520,7 @@ resources:
     ConnectorECSCpuAlarm:
       Type: AWS::CloudWatch::Alarm
       Properties:
-        AlarmName: ${self:service}-${sls:stage}-CPUUtilization
+        AlarmName: ${self:service}-${sls:stage}-KafkaConnectService-CPUUtilization
         AlarmDescription: "Trigger an alarm when the CPU utilization reaches 75%"
         Namespace: AWS/ECS
         MetricName: "CPUUtilization"
@@ -548,7 +548,7 @@ resources:
     ConnectorECSMemoryAlarm:
       Type: AWS::CloudWatch::Alarm
       Properties:
-        AlarmName: ${self:service}-${sls:stage}-MemoryUtilization
+        AlarmName: ${self:service}-${sls:stage}-KafkaConnectService-MemoryUtilization
         AlarmDescription: "Trigger an alarm when the Memory utilization reaches 75%"
         Namespace: AWS/ECS
         MetricName: "MemoryUtilization"
