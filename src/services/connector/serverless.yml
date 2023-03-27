@@ -295,7 +295,7 @@ resources:
               - |
                 export CONNECT_REST_HOST_NAME=`curl $ECS_CONTAINER_METADATA_URI_V4 | sed -e 's/.*IPv4Addresses":\["\(.*\)"\],"AttachmentIndex.*/\1/'` &&
                 echo "$CONNECT_REST_HOST_NAME localhost" > /etc/hosts &&
-                run user -l appuser -c '''
+                runuser -l appuser -c '''
                   export CONNECT_REST_HOST_NAME=`curl $ECS_CONTAINER_METADATA_URI_V4 | sed -e 's/.*IPv4Addresses":\["\(.*\)"\],"AttachmentIndex.*/\1/'` &&
                   export CONNECT_REST_ADVERTISED_HOST_NAME=$CONNECT_REST_HOST_NAME &&
                   echo "export SELF=$CONNECT_REST_HOST_NAME" >> ~/.bashrc &&
