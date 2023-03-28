@@ -72,6 +72,9 @@ custom:
         for task in "${runningTasks[@]}"
         do
           echo """
+          To forward the connector's Kafka Connect REST API to your localhost:8083, run:
+          ecs-exec-pf -c ${self:service}-${sls:stage}-connect -t ${task##*/} -p 8083 -l 8083
+
           To conect to the connector, run:
           aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container connect --interactive --command "/bin/sh"
 
@@ -293,12 +296,14 @@ resources:
               - bash
               - "-c"
               - |
-                export CONNECT_REST_HOST_NAME=`curl $ECS_CONTAINER_METADATA_URI_V4 | sed -e 's/.*IPv4Addresses":\["\(.*\)"\],"AttachmentIndex.*/\1/'` &&
-                echo "$CONNECT_REST_HOST_NAME localhost" > /etc/hosts &&
-                runuser -l appuser -c '''
-                  export CONNECT_REST_HOST_NAME=`curl $ECS_CONTAINER_METADATA_URI_V4 | sed -e 's/.*IPv4Addresses":\["\(.*\)"\],"AttachmentIndex.*/\1/'` &&
-                  export CONNECT_REST_ADVERTISED_HOST_NAME=$CONNECT_REST_HOST_NAME &&
-                  echo "export SELF=$CONNECT_REST_HOST_NAME" >> ~/.bashrc &&
+                export ENI_IP=`curl $ECS_CONTAINER_METADATA_URI_V4 | sed -e 's/.*IPv4Addresses":\["\(.*\)"\],"AttachmentIndex.*/\1/'` &&
+                echo "$ENI_IP localhost" > /etc/hosts &&
+                echo "export ENI_IP=$ENI_IP" >> /home/appuser/.bashrc
+                runuser -p appuser -c '''
+                  export HOME=/home/appuser &&
+                  source /home/appuser/.bashrc
+                  export CONNECT_REST_HOST_NAME=$ENI_IP &&
+                  export CONNECT_REST_ADVERTISED_HOST_NAME=$ENI_IP &&
                   curl -k -SL -O "https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/1.9.2.Final/debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz" &&
                   tar -xf debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz -C /usr/share/java &&
                   /etc/confluent/docker/run
