@@ -113,8 +113,8 @@ if ! which colima > /dev/null ; then
 fi
 
 # Install ecs-exec-pf, a utility that allows easy port forwarding to/from Fargate tasks over ECS Exec.
-if ! which colima > /dev/null ; then
-  brew install colima
+if ! which ecs-exec-pf > /dev/null ; then
+  brew install ecs-exec-pf
 fi
 
 # Install and configure direnv, a tool for automatically setting environment variables
