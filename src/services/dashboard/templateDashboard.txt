@@ -85,7 +85,7 @@
                         "ServiceName",
                         "kafka-connect",
                         "ClusterName",
-                        "seatool-connectors-${sls:stage}-connect",
+                        "seatool-connector-${sls:stage}-connect",
                         {
                             "color": "#ff7f0e"
                         }
@@ -123,10 +123,10 @@
             "x": 0,
             "type": "log",
             "properties": {
-                "query": "SOURCE '/aws/fargate/seatool-connectors-${sls:stage}-kafka-connect' | fields @timestamp, @message\n| sort @timestamp desc\n| limit 20",
+                "query": "SOURCE '/aws/fargate/seatool-connector-${sls:stage}-kafka-connect' | fields @timestamp, @message\n| sort @timestamp desc\n| limit 20",
                 "region": "${env:REGION_A}",
                 "stacked": false,
-                "title": "Connector ECS Logs: /aws/fargate/seatool-connectors-${sls:stage}-kafka-connect",
+                "title": "Connector ECS Logs: /aws/fargate/seatool-connector-${sls:stage}-kafka-connect",
                 "view": "table"
             }
         },
@@ -139,12 +139,12 @@
             "properties": {
                 "title": "Connector Alarms",
                 "alarms": [
-                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connectors-${sls:stage}-JdbcTaskAlarm-1CQOFNLUKS7KV",
-                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connectors-${sls:stage}-JdbcConnectorAlarm-WL4ZMADV64NE",
-                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connectors-${sls:stage}-ConnectorLogsErrorCount",
-                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connectors-${sls:stage}-KafkaConnectService-CPUUtilization",
-                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connectors-${sls:stage}-KafkaConnectService-MemoryUtilization",
-                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connectors-${sls:stage}-ConnectorLogsWarnCount"
+                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connector-${sls:stage}-JdbcTaskAlarm-1CQOFNLUKS7KV",
+                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connector-${sls:stage}-JdbcConnectorAlarm-WL4ZMADV64NE",
+                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connector-${sls:stage}-ConnectorLogsErrorCount",
+                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connector-${sls:stage}-KafkaConnectService-CPUUtilization",
+                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connector-${sls:stage}-KafkaConnectService-MemoryUtilization",
+                    "arn:aws:cloudwatch:${env:REGION_A}:${aws:accountId}:alarm:seatool-connector-${sls:stage}-ConnectorLogsWarnCount"
                 ]
             }
         },
@@ -162,7 +162,7 @@
                         "AWS/Lambda",
                         "Invocations",
                         "FunctionName",
-                        "seatool-connectors-${sls:stage}-configureConnectors"
+                        "seatool-connector-${sls:stage}-configureConnectors"
                     ],
                     [
                         ".",
@@ -196,7 +196,7 @@
                 "query": "SOURCE '/aws/fargate/seatool-ksqldb-${sls:stage}-ksqldb-headless' | fields @timestamp, @message\n| sort @timestamp desc\n| limit 20",
                 "region": "${env:REGION_A}",
                 "stacked": false,
-                "title": "KSQLDB Headless Logs: /aws/fargate/seatool-connectors-${sls:stage}-kafka-connect",
+                "title": "KSQLDB Headless Logs: /aws/fargate/seatool-connector-${sls:stage}-kafka-connect",
                 "view": "table"
             }
         },
@@ -285,7 +285,7 @@
                 "query": "SOURCE '/aws/fargate/seatool-ksqldb-${sls:stage}-ksqldbInt' | fields @timestamp, @message\n| sort @timestamp desc\n| limit 20",
                 "region": "${env:REGION_A}",
                 "stacked": false,
-                "title": "KSQLDB Interactive Logs: /aws/fargate/seatool-connectors-${sls:stage}-kafka-connect",
+                "title": "KSQLDB Interactive Logs: /aws/fargate/seatool-connector-${sls:stage}-kafka-connect",
                 "view": "table"
             }
         }
