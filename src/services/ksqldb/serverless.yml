@@ -107,11 +107,6 @@ resources:
         - Fn::Equals:
             - ${param:topicNamespace}
             - ""
-      - Effect: "Allow"
-        Action:
-          - sts:AssumeRole
-        Resource:
-          - ${self:custom.bigmacRoleArn}
   Resources:
     ksqldbHeadlessLogGroup:
       Type: "AWS::Logs::LogGroup"
@@ -172,7 +167,11 @@ resources:
                   Action:
                     - ecr:BatchGetImage
                   Resource: !Sub "arn:aws:ecr:${self:provider.region}:${AWS::AccountId}:repository/*"
-
+                - Effect: "Allow"
+                  Action:
+                    - sts:AssumeRole
+                  Resource:
+                    - ${self:custom.bigmacRoleArn}
     ksqldbHeadlessTaskDefinition:
       Type: "AWS::ECS::TaskDefinition"
       Properties:
@@ -355,6 +354,7 @@ resources:
                 curl -O https://packages.confluent.io/archive/7.0/confluent-community-7.0.0.tar.gz &&
                 tar -xzvf confluent-community-7.0.0.tar.gz &&
                 ln -s confluent-community-7.0.0 confluent-community &&
+                curl -k -SL -o /usr/share/java/ksqldb-rest-app/aws-msk-iam-auth-1.1.3-all.jar "https://github.com/aws/aws-msk-iam-auth/releases/download/v1.1.3/aws-msk-iam-auth-1.1.3-all.jar" &&
                 /usr/bin/docker/run
             Environment:
               - Name: KSQL_LISTENERS
@@ -366,7 +366,13 @@ resources:
               - Name: KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE
                 Value: "true"
               - Name: KSQL_SECURITY_PROTOCOL
-                Value: SSL
+                Value: SASL_SSL
+              - Name: KSQL_SASL_MECHANISM
+                Value: AWS_MSK_IAM
+              - Name: KSQL_SASL_JAAS_CONFIG
+                Value: software.amazon.msk.auth.iam.IAMLoginModule required awsRoleArn="${self:custom.bigmacRoleArn}";
+              - Name: KSQL_SASL_CLIENT_CALLBACK_HANDLER_CLASS
+                Value: software.amazon.msk.auth.iam.IAMClientCallbackHandler
               - Name: KSQL_KSQL_INTERNAL_TOPIC_REPLICAS
                 Value: 3
               - Name: KSQL_KSQL_INTERNAL_TOPIC_MIN_INSYNC_REPLICAS
@@ -381,6 +387,8 @@ resources:
                 Value: 2
               - Name: KSQL_KSQL_SERVICE_ID
                 Value: "${param:topicNamespace}${self:service}-int"
+              - Name: KSQL_CLASSPATH
+                Value: "/usr/share/java/ksqldb-rest-app/*"
             LogConfiguration:
               LogDriver: awslogs
               Options:
