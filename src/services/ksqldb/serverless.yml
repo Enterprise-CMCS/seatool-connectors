@@ -107,11 +107,11 @@ resources:
         - Fn::Equals:
             - ${param:topicNamespace}
             - ""
-    - Effect: "Allow"
-      Action:
-        - sts:AssumeRole
-      Resource:
-        - ${self:custom.bigmacRoleArn}
+      - Effect: "Allow"
+        Action:
+          - sts:AssumeRole
+        Resource:
+          - ${self:custom.bigmacRoleArn}
   Resources:
     ksqldbHeadlessLogGroup:
       Type: "AWS::Logs::LogGroup"
