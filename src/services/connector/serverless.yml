@@ -373,7 +373,7 @@ resources:
               - Name: CONNECT_PRODUCER_SASL_MECHANISM
                 Value: AWS_MSK_IAM
               - Name: CONNECT_PRODUCER_SASL_JAAS_CONFIG
-                Value: software.amazon.msk.auth.iam.IAMLoginModule required awsRoleArn="${self:custom.bigmacRoleArn}";	
+                Value: software.amazon.msk.auth.iam.IAMLoginModule required awsRoleArn="${self:custom.bigmacRoleArn}";
               - Name: CONNECT_PRODUCER_SASL_CLIENT_CALLBACK_HANDLER_CLASS
                 Value: software.amazon.msk.auth.iam.IAMClientCallbackHandler
               - Name: CONNECT_CONSUMER_BOOTSTRAP_SERVERS
@@ -384,7 +384,7 @@ resources:
               - Name: CONNECT_CONSUMER_SASL_MECHANISM
                 Value: AWS_MSK_IAM
               - Name: CONNECT_CONSUMER_SASL_JAAS_CONFIG
-                Value: software.amazon.msk.auth.iam.IAMLoginModule required awsRoleArn="${self:custom.bigmacRoleArn}";	
+                Value: software.amazon.msk.auth.iam.IAMLoginModule required awsRoleArn="${self:custom.bigmacRoleArn}";
               - Name: CONNECT_CONSUMER_SASL_CLIENT_CALLBACK_HANDLER_CLASS
                 Value: software.amazon.msk.auth.iam.IAMClientCallbackHandler
               - Name: CONNECT_PRODUCER_OFFSET_FLUSH_TIMEOUT_MS
