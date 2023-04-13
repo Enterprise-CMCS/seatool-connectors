@@ -1,8 +1,8 @@
 const _ = require("lodash");
-import { Kafka, ResourceTypes } from "kafkajs";
-const {	
-  createMechanism,	
-} = require("@jm18457/kafkajs-msk-iam-authentication-mechanism");	
+import { Kafka, ConfigResourceTypes } from "kafkajs";
+const {
+  createMechanism,
+} = require("@jm18457/kafkajs-msk-iam-authentication-mechanism");
 const { STSClient, AssumeRoleCommand } = require("@aws-sdk/client-sts");
 
 export async function createTopics(brokerString, topicsConfig) {
@@ -138,24 +138,24 @@ export async function deleteTopics(brokerString, topicList) {
   await admin.disconnect();
 }
 
-async function getMechanism(region, role) {	
-  const sts = new STSClient({	
-    region,	
-  });	
-  const crossAccountRoleData = await sts.send(	
-    new AssumeRoleCommand({	
-      RoleArn: role,	
-      RoleSessionName: "LambdaSession",	
-      ExternalId: "asdf",	
-    })	
-  );	
-  return createMechanism({	
-    region,	
-    credentials: {	
-      authorizationIdentity: crossAccountRoleData.AssumedRoleUser.AssumeRoleId,	
-      accessKeyId: crossAccountRoleData.Credentials.AccessKeyId,	
-      secretAccessKey: crossAccountRoleData.Credentials.SecretAccessKey,	
-      sessionToken: crossAccountRoleData.Credentials.SessionToken,	
-    },	
-  });	
+async function getMechanism(region, role) {
+  const sts = new STSClient({
+    region,
+  });
+  const crossAccountRoleData = await sts.send(
+    new AssumeRoleCommand({
+      RoleArn: role,
+      RoleSessionName: "LambdaSession",
+      ExternalId: "asdf",
+    })
+  );
+  return createMechanism({
+    region,
+    credentials: {
+      authorizationIdentity: crossAccountRoleData.AssumedRoleUser.AssumeRoleId,
+      accessKeyId: crossAccountRoleData.Credentials.AccessKeyId,
+      secretAccessKey: crossAccountRoleData.Credentials.SecretAccessKey,
+      sessionToken: crossAccountRoleData.Credentials.SessionToken,
+    },
+  });
 }
