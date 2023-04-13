@@ -131,7 +131,6 @@ functions:
       legacyDb: ${self:custom.dbInfo.db}
       legacydbUser: ${self:custom.dbInfo.user}
       legacydbPassword: ${self:custom.dbInfo.password}
-      bootstrapBrokerStringTls: ${self:custom.brokerString}
     maximumRetryAttempts: 0
     timeout: 300
     vpc:
