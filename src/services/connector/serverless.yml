@@ -118,7 +118,7 @@ functions:
       subnetIds: >-
         ${self:custom.vpc.privateSubnets}
     timeout: 300
-    environment:
+    environment:	
       bigmacRoleArn: ${self:custom.bigmacRoleArn}
   configureConnectors:
     handler: handlers/configureConnectors.handler
