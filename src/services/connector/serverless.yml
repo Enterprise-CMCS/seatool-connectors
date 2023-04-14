@@ -320,6 +320,10 @@ resources:
                   export CONNECT_REST_ADVERTISED_HOST_NAME=$ENI_IP &&
                   curl -k -SL -O "https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/1.9.2.Final/debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz" &&
                   tar -xf debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz -C /usr/share/java &&
+                  curl -O http://client.hub.confluent.io/confluent-hub-client-latest.tar.gz &&	
+                  tar -xzvf confluent-hub-client-latest.tar.gz &&	
+                  confluent-hub install confluentinc/kafka-connect-jdbc:10.5.1 --no-prompt &&	
+                  curl -L -o /usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib/ojdbc10.jar  https://download.oracle.com/otn-pub/otn_software/jdbc/1916/ojdbc10.jar &&
                   /etc/confluent/docker/run
                 '''
             Environment:
