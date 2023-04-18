@@ -6,9 +6,10 @@ export async function createTopics(brokerString, topicsConfig) {
   const brokers = brokerString.split(",");
 
   const kafka = new Kafka({
-    clientId: "admin",
+    clientId: "createTopics",
     brokers: brokers,
     ssl: true,
+    sasl: await getMechanism("us-east-1", process.env.bigmacRoleArn),
   });
   var admin = kafka.admin();
 
@@ -61,7 +62,7 @@ export async function createTopics(brokerString, topicsConfig) {
     const configOptions = _.map(topicsMetadata, function (topic) {
       return {
         name: _.get(topic, "name"),
-        type: _.get(ResourceTypes, "TOPIC"),
+        type: _.get(ConfigResourceTypes, "TOPIC"),
       };
     });
 
@@ -106,9 +107,10 @@ export async function deleteTopics(brokerString, topicList) {
   const brokers = brokerString.split(",");
 
   const kafka = new Kafka({
-    clientId: "admin",
+    clientId: "cleanupKafka",
     brokers: brokers,
     ssl: true,
+    sasl: await getMechanism("us-east-1", process.env.bigmacRoleArn),
     requestTimeout: 295000, // 5s short of the lambda function's timeout
   });
   var admin = kafka.admin();
@@ -130,4 +132,26 @@ export async function deleteTopics(brokerString, topicList) {
   });
 
   await admin.disconnect();
+}
+
+async function getMechanism(region, role) {
+  const sts = new STSClient({
+    region,
+  });
+  const crossAccountRoleData = await sts.send(
+    new AssumeRoleCommand({
+      RoleArn: role,
+      RoleSessionName: "LambdaSession",
+      ExternalId: "asdf",
+    })
+  );
+  return createMechanism({
+    region,
+    credentials: {
+      authorizationIdentity: crossAccountRoleData.AssumedRoleUser.AssumeRoleId,
+      accessKeyId: crossAccountRoleData.Credentials.AccessKeyId,
+      secretAccessKey: crossAccountRoleData.Credentials.SecretAccessKey,
+      sessionToken: crossAccountRoleData.Credentials.SessionToken,
+    },
+  });
 }

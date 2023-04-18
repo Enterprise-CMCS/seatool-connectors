@@ -419,7 +419,6 @@ resources:
       Type: "AWS::ECS::Cluster"
       Properties:
         ClusterName: ${self:service}-${sls:stage}-connect
-
     KafkaConnectService:
       Type: "AWS::ECS::Service"
       Properties:
