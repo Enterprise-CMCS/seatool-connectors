@@ -1,5 +1,9 @@
 const _ = require("lodash");
-import { Kafka, ResourceTypes } from "kafkajs";
+import { Kafka, ConfigResourceTypes } from "kafkajs";
+const {
+  createMechanism,
+} = require("@jm18457/kafkajs-msk-iam-authentication-mechanism");
+const { STSClient, AssumeRoleCommand } = require("@aws-sdk/client-sts");
 
 export async function createTopics(brokerString, topicsConfig) {
   const topics = topicsConfig;
