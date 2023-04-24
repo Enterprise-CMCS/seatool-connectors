@@ -138,20 +138,6 @@ functions:
         - Ref: LambdaConfigureConnectorsSecurityGroup
       subnetIds: >-
         ${self:custom.vpc.privateSubnets}
-  # testConnectors:
-  #   handler: handlers/testConnectors.handler
-  #   environment:
-  #     cluster: !Ref KafkaConnectCluster
-  #     service: !Ref KafkaConnectService
-  #     namespace: ${self:service}-${sls:stage}
-  #   timeout: 300
-  #   events:
-  #     - schedule: cron(0/1 * ? * * *)
-  #   vpc:
-  #     securityGroupIds:
-  #       - Ref: LambdaConfigureConnectorsSecurityGroup
-  #     subnetIds: >-
-  #       ${self:custom.vpc.privateSubnets}
 
 resources:
   Conditions:
