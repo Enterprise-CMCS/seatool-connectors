@@ -387,7 +387,7 @@ resources:
                 sleep infinity
           - Name: connect-ui  # added new container def for kafka connect ui
             Image: ${self:custom.connectUiImage}
-            Memory: 6GB
+            Memory: 4096
             Cpu: 2048
             depends_on: # added condition so that kafka connect is healthy
               - connect:
