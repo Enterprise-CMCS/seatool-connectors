@@ -389,9 +389,9 @@ resources:
             Image: ${self:custom.connectUiImage}
             Memory: 4096
             Cpu: 2048
-            depends_on: # added condition so that kafka connect is healthy
-              - connect:
-                  condition: HEALTHY
+            DependsOn: # added condition so that kafka connect is healthy
+              - ContainerName: connect
+                Condition: HEALTHY
             portMappings:
               - containerPort: 8001
                 hostPort: 8001
