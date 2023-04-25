@@ -57,6 +57,8 @@ custom:
   brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
   dbInfo: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/dbInfo, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/dbInfo}
   connectImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/cp-kafka-connect:6.0.9"}
+  connectUiImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}/connectui, "landoop/kafka-connect-ui"} # gettint hte container image for kafka connect ui
+  bigmacRoleArn: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/bigmacRoleArn, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/bigmacRoleArn}
   scripts:
     hooks:
       deploy:finalize: |
@@ -74,6 +76,9 @@ custom:
           echo """
           To forward the connector's Kafka Connect REST API to your localhost:8083, run:
           ecs-exec-pf -c ${self:service}-${sls:stage}-connect -t ${task##*/} -p 8083 -l 8083
+
+          To forward the connector's Kafka Connect Ui to your localhost:8001, run:
+          ecs-exec-pf -c ${self:service}-${sls:stage}-connect-ui -t ${task##*/} -p 8001 -l 8001
 
           To conect to the connector, run:
           aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container connect --interactive --command "/bin/sh"
@@ -225,10 +230,19 @@ resources:
       Type: "AWS::Logs::LogGroup"
       Properties:
         LogGroupName: /aws/fargate/${self:service}-${sls:stage}-kafka-connect
+    KafkaConnectUiWorkerLogGroup: # created a new log group for  the kafka connect ui
+      Type: "AWS::Logs::LogGroup"
+      Properties:
+        LogGroupName: /aws/fargate/${self:service}-${sls:stage}-kafka-connect-ui
     KafkaConnectWorkerSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
         GroupDescription: Security Group for the Fargate Connect Workers.
+        VpcId: ${self:custom.vpc.id}
+    KafkaConnectUiWorkerSecurityGroup: # created a secourity group for kafka connect ui
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Security Group for the Fargate Connect Ui Workers.
         VpcId: ${self:custom.vpc.id}
     KafkaConnectWorkerSecurityGroupEgressLambda:
       Type: AWS::EC2::SecurityGroupEgress
@@ -252,6 +266,14 @@ resources:
         FromPort: 8083
         ToPort: 8083
         SourceSecurityGroupId: !Ref KafkaConnectWorkerSecurityGroup
+    KafkaConnectUiWorkerSecurityGroupIngressCluster: # ingressed the  kafka connect ui to the local port 8001
+      Type: AWS::EC2::SecurityGroupIngress
+      Properties:
+        GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
+        IpProtocol: tcp
+        FromPort: 8001
+        ToPort: 8001
+        SourceSecurityGroupId: !Ref KafkaConnectUiWorkerSecurityGroup
     KafkaConnectWorkerRole:
       Type: "AWS::IAM::Role"
       Properties:
@@ -363,6 +385,28 @@ resources:
               - "-c"
               - |
                 sleep infinity
+        ContainerDefinitions: # aadded new container fdef for kafka connect ui
+          - Name: connect-ui
+            Image: ${self:custom.connectUiImage}
+            Memory: 6GB
+            Cpu: 2048
+            depends_on: # added condition so that kafka connect is healthy
+              - connect:
+                  condition: HEALTHY
+            portMappings:
+              - containerPort: 8001
+                hostPort: 8001
+            Environment:
+              - Name: CONNECT_URL
+                Value: 127.0.0.1
+            LogConfiguration:
+              LogDriver: awslogs
+              Options:
+                awslogs-region: !Ref AWS::Region
+                awslogs-group: !Ref KafkaConnectUiWorkerLogGroup
+                awslogs-stream-prefix: fargate
+                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
+
         Family: ${self:service}-${sls:stage}-kafka-connect-worker
         NetworkMode: awsvpc
         ExecutionRoleArn: !GetAtt KafkaConnectWorkerRole.Arn
