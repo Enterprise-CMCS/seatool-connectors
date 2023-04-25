@@ -244,6 +244,12 @@ resources:
       Properties:
         GroupDescription: Security Group for the Fargate Connect Ui Workers.
         VpcId: ${self:custom.vpc.id}
+    KafkaConnectUiWorkerSecurityGroupEgressLambda: # created Engress for a secourity group for kafka connect ui
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
     KafkaConnectWorkerSecurityGroupEgressLambda:
       Type: AWS::EC2::SecurityGroupEgress
       Properties:
