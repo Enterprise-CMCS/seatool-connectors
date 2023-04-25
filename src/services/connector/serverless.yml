@@ -391,7 +391,7 @@ resources:
             Cpu: 2048
             DependsOn: # added condition so that kafka connect is healthy
               - ContainerName: connect
-                Condition: HEALTHY
+                Condition: SUCCESS
             portMappings:
               - containerPort: 8001
                 hostPort: 8001
