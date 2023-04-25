@@ -385,8 +385,7 @@ resources:
               - "-c"
               - |
                 sleep infinity
-        ContainerDefinitions: # aadded new container fdef for kafka connect ui
-          - Name: connect-ui
+          - Name: connect-ui  # added new container def for kafka connect ui
             Image: ${self:custom.connectUiImage}
             Memory: 6GB
             Cpu: 2048
@@ -405,7 +404,7 @@ resources:
                 awslogs-region: !Ref AWS::Region
                 awslogs-group: !Ref KafkaConnectUiWorkerLogGroup
                 awslogs-stream-prefix: fargate
-                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
+                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,  
 
         Family: ${self:service}-${sls:stage}-kafka-connect-worker
         NetworkMode: awsvpc
