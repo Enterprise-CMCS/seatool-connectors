@@ -261,7 +261,7 @@ resources:
       Properties:
         GroupId: !Ref KafkaConnectWorkerSecurityGroup
         IpProtocol: tcp
-        FromPort: 8083arn:aws:ecs:us-east-1:677829493285:task/seatool-connector-connect-ui-connect/572839ebe8e7447cb2eb6269c993c511
+        FromPort: 8083
         ToPort: 8083
         SourceSecurityGroupId: !Ref LambdaConfigureConnectorsSecurityGroup
     KafkaConnectWorkerSecurityGroupIngressCluster:
@@ -277,7 +277,7 @@ resources:
       Properties:
         GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
         IpProtocol: tcp
-        FromPort: 8001arn:aws:ecs:us-east-1:677829493285:task/seatool-connector-connect-ui-connect-ui/572839ebe8e7447cb2eb6269c993c511
+        FromPort: 8001
         ToPort: 8001
         SourceSecurityGroupId: !Ref LambdaConfigureConnectorsSecurityGroup
     KafkaConnectUiWorkerSecurityGroupIngressCluster: # ingressed the  kafka connect ui to the local port 8001
