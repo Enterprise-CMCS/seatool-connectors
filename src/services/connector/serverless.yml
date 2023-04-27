@@ -80,7 +80,7 @@ custom:
           To forward the connector's Kafka Connect Ui to your localhost:8001, run:
           ecs-exec-pf -c ${self:service}-${sls:stage}-connect-ui -t ${task##*/} -p 8001 -l 8001
 
-          To conect to the connector, run:
+          To connect to the connector, run:
           aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container connect --interactive --command "/bin/sh"
 
           To connect to the sql instantclient, run:
@@ -261,7 +261,7 @@ resources:
       Properties:
         GroupId: !Ref KafkaConnectWorkerSecurityGroup
         IpProtocol: tcp
-        FromPort: 8083
+        FromPort: 8083arn:aws:ecs:us-east-1:677829493285:task/seatool-connector-connect-ui-connect/572839ebe8e7447cb2eb6269c993c511
         ToPort: 8083
         SourceSecurityGroupId: !Ref LambdaConfigureConnectorsSecurityGroup
     KafkaConnectWorkerSecurityGroupIngressCluster:
