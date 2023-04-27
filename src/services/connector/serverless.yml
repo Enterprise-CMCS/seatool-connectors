@@ -272,6 +272,14 @@ resources:
         FromPort: 8083
         ToPort: 8083
         SourceSecurityGroupId: !Ref KafkaConnectWorkerSecurityGroup
+    KafkaConnectUiWorkerSecurityGroupIngressLambda: # added ingress setting for the connect-ui to forward port to port 8001, 
+      Type: AWS::EC2::SecurityGroupIngress
+      Properties:
+        GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
+        IpProtocol: tcp
+        FromPort: 8001arn:aws:ecs:us-east-1:677829493285:task/seatool-connector-connect-ui-connect-ui/572839ebe8e7447cb2eb6269c993c511
+        ToPort: 8001
+        SourceSecurityGroupId: !Ref LambdaConfigureConnectorsSecurityGroup
     KafkaConnectUiWorkerSecurityGroupIngressCluster: # ingressed the  kafka connect ui to the local port 8001
       Type: AWS::EC2::SecurityGroupIngress
       Properties:
