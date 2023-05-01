@@ -411,7 +411,7 @@ resources:
 #                hostPort: 8000
             Environment:
               - Name: CONNECT_URL
-                Value: 10.223.41.69:8083
+                Value: http://localhost
             LogConfiguration:
               LogDriver: awslogs
               Options:
