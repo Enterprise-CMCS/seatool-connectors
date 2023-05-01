@@ -77,8 +77,8 @@ custom:
           To forward the connector's Kafka Connect REST API to your localhost:8083, run:
           ecs-exec-pf -c ${self:service}-${sls:stage}-connect -t ${task##*/} -p 8083 -l 8083
 
-          To forward the connector's Kafka Connect Ui to your localhost:8080, run:
-          ecs-exec-pf -c ${self:service}-${sls:stage}-connect -t ${task##*/} -p 8080 -l 8080
+          To forward the connector's Kafka Connect Ui to your localhost:8084, run:
+          ecs-exec-pf -c ${self:service}-${sls:stage}-connect -t ${task##*/} -p 8084 -l 8084
 
           To connect to the connector, run:
           aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container connect --interactive --command "/bin/sh"
@@ -272,21 +272,21 @@ resources:
         FromPort: 8083
         ToPort: 8083
         SourceSecurityGroupId: !Ref KafkaConnectWorkerSecurityGroup
-    KafkaConnectUiWorkerSecurityGroupIngressLambda: # added ingress setting for the connect-ui to forward port to port 8080, 
+    KafkaConnectUiWorkerSecurityGroupIngressLambda: # added ingress setting for the connect-ui to forward port to port 8084, 
       Type: AWS::EC2::SecurityGroupIngress
       Properties:
         GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
         IpProtocol: tcp
-        FromPort: 8080
-        ToPort: 8080
+        FromPort: 8084
+        ToPort: 8084
         SourceSecurityGroupId: !Ref LambdaConfigureConnectorsSecurityGroup
-    KafkaConnectUiWorkerSecurityGroupIngressCluster: # ingressed the  kafka connect ui to the local port 8080
+    KafkaConnectUiWorkerSecurityGroupIngressCluster: # ingressed the  kafka connect ui to the local port 8084
       Type: AWS::EC2::SecurityGroupIngress
       Properties:
         GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
         IpProtocol: tcp
-        FromPort: 8080
-        ToPort: 8080
+        FromPort: 8084
+        ToPort: 8084
         SourceSecurityGroupId: !Ref KafkaConnectUiWorkerSecurityGroup
     KafkaConnectWorkerRole:
       Type: "AWS::IAM::Role"
@@ -407,8 +407,8 @@ resources:
               - ContainerName: connect
                 Condition: START
             portMappings:
-              - containerPort: 8080
-                hostPort: 8080
+              - containerPort: 8084
+                hostPort: 8084
             Environment:
               - Name: CONNECT_URL
                 Value: 127.0.0.1:8083
