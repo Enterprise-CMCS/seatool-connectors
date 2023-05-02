@@ -406,12 +406,12 @@ resources:
             DependsOn: # added condition so that kafka connect is healthy
               - ContainerName: connect
                 Condition: START
-#            portMappings:
-#              - containerPort: 8000
-#                hostPort: 8000
+            portMappings:
+             - containerPort: 8000
+               hostPort: 8000
             Environment:
               - Name: CONNECT_URL
-                Value: http://localhost
+                Value: http://localhost:8083
             LogConfiguration:
               LogDriver: awslogs
               Options:
