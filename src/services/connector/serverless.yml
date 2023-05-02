@@ -328,8 +328,6 @@ resources:
             Memory: 4096
             Cpu: 2048
             User: "root"
-            networks:
-              - shared-net
             Command:
               - bash
               - "-c"
@@ -405,8 +403,6 @@ resources:
             Image: ${self:custom.connectUiImage}
             Memory: 4096
             Cpu: 2048
-            networks:
-              - shared-net
             DependsOn: # added condition so that kafka connect is healthy
               - ContainerName: connect
                 Condition: START
@@ -432,9 +428,6 @@ resources:
           - FARGATE
         Memory: 8GB
         Cpu: 4096
-        networks:
-          shared-net:
-            external: true
         Tags:
           - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
             Value:
