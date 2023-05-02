@@ -327,6 +327,9 @@ resources:
             Image: ${self:custom.connectImage}
             Memory: 4096
             Cpu: 2048
+            portMappings:
+             - containerPort: 8083
+               hostPort: 8083
             User: "root"
             Command:
               - bash
