@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cmsgov/seatool-connectors"
+    "url": "https://github.com/Enterprise-CMCS/seatool-connectors"
   },
   "author": "",
   "license": "CC0-1.0",
   "bugs": {
-    "url": "https://github.com/CMSgov/seatool-connectors/issues"
+    "url": "https://github.com/Enterprise-CMCS/seatool-connectors/issues"
   },
-  "homepage": "https://github.com/CMSgov/seatool-connectors#readme",
+  "homepage": "https://github.com/Enterprise-CMCS/seatool-connectors#readme",
   "devDependencies": {
     "@enterprise-cmcs/macpro-security-hub-sync": "^1.5.3",
     "@enterprise-cmcs/macpro-serverless-running-stages": "^1.0.4",

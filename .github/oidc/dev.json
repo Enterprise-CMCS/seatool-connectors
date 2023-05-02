@@ -1,7 +1,7 @@
 [
   {
     "ParameterKey": "SubjectClaimFilters",
-    "ParameterValue": "repo:CMSgov/seatool-connectors:*"
+    "ParameterValue": "repo:Enterprise-CMCS/seatool-connectors:*"
   },
   {
     "ParameterKey": "Path",
