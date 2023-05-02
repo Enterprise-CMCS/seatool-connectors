@@ -328,6 +328,8 @@ resources:
             Memory: 4096
             Cpu: 2048
             User: "root"
+            ports:
+              - "8083:8083"
             Command:
               - bash
               - "-c"
@@ -409,6 +411,9 @@ resources:
             portMappings:
              - containerPort: 8000
                hostPort: 8000
+            ports:
+              - "8000:8000" 
+            network_mode: bridge
             Environment:
               - Name: CONNECT_URL
                 Value: http://localhost:8083
