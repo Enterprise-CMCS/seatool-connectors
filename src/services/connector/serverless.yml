@@ -338,16 +338,15 @@ resources:
               - bash
               - "-c"
               - |
-                export ENI_IP=`curl $ECS_CONTAINER_METADATA_URI_V4 | sed -e 's/.*IPv4Addresses":\["\(.*\)"\],"AttachmentIndex.*/\1/'` &&
-                echo "$ENI_IP localhost" > /etc/hosts &&
-                echo "export ENI_IP=$ENI_IP" >> /home/appuser/.bashrc
+                export CONNECT_REST_HOST_NAME=0.0.0.0
+                export CONNECT_REST_ADVERTISED_HOST_NAME=localhost
+
                 runuser -p appuser -c '''
-                  export HOME=/home/appuser &&
+                  export HOME=/home/appuser
                   source /home/appuser/.bashrc
-                  export CONNECT_REST_HOST_NAME=$ENI_IP &&
-                  export CONNECT_REST_ADVERTISED_HOST_NAME=$ENI_IP &&
-                  curl -k -SL -O "https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/1.9.2.Final/debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz" &&
-                  tar -xf debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz -C /usr/share/java &&
+
+                  curl -k -SL -O "https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/1.9.2.Final/debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz"
+                  tar -xf debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz -C /usr/share/java
                   /etc/confluent/docker/run
                 '''
             Environment:
