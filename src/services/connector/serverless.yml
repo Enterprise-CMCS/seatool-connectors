@@ -272,7 +272,7 @@ resources:
         FromPort: 8083
         ToPort: 8083
         SourceSecurityGroupId: !Ref KafkaConnectWorkerSecurityGroup
-    KafkaConnectUiWorkerSecurityGroupIngressLambda: # added ingress setting for the connect-ui to forward port to port 8000, 
+    KafkaConnectUiWorkerSecurityGroupIngressLambda: # added ingress setting for the connect-ui to forward port to port 8000,
       Type: AWS::EC2::SecurityGroupIngress
       Properties:
         GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
@@ -328,8 +328,8 @@ resources:
             Memory: 4096
             Cpu: 2048
             portMappings:
-             - containerPort: 8083
-               hostPort: 8083
+              - containerPort: 8083
+                hostPort: 8083
             User: "root"
             Command:
               - bash
@@ -402,7 +402,7 @@ resources:
               - "-c"
               - |
                 sleep infinity
-          - Name: connect-ui  # added new container def for kafka connect ui
+          - Name: connect-ui # added new container def for kafka connect ui
             Image: ${self:custom.connectUiImage}
             Memory: 4096
             Cpu: 2048
@@ -410,8 +410,8 @@ resources:
               - ContainerName: connect
                 Condition: START
             portMappings:
-             - containerPort: 8000
-               hostPort: 8000
+              - containerPort: 8000
+                hostPort: 8000
             Environment:
               - Name: CONNECT_URL
                 Value: http://localhost:8083
@@ -421,7 +421,7 @@ resources:
                 awslogs-region: !Ref AWS::Region
                 awslogs-group: !Ref KafkaConnectUiWorkerLogGroup
                 awslogs-stream-prefix: fargate
-                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,  
+                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
 
         Family: ${self:service}-${sls:stage}-kafka-connect-worker
         NetworkMode: awsvpc
