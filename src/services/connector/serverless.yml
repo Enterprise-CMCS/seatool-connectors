@@ -83,6 +83,9 @@ custom:
           To connect to the connector, run:
           aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container connect --interactive --command "/bin/sh"
 
+          To connect to the connector, run:
+          aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container connect-ui --interactive --command "/bin/sh"
+
           To connect to the sql instantclient, run:
           aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container instantclient --interactive --command "/bin/sh"
           """
@@ -272,7 +275,7 @@ resources:
         FromPort: 8083
         ToPort: 8083
         SourceSecurityGroupId: !Ref KafkaConnectWorkerSecurityGroup
-    KafkaConnectUiWorkerSecurityGroupIngressLambda: # added ingress setting for the connect-ui to forward port to port 8000, 
+    KafkaConnectUiWorkerSecurityGroupIngressLambda: # added ingress setting for the connect-ui to forward port to port 8000,
       Type: AWS::EC2::SecurityGroupIngress
       Properties:
         GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
@@ -328,23 +331,22 @@ resources:
             Memory: 4096
             Cpu: 2048
             portMappings:
-             - containerPort: 8083
-               hostPort: 8083
+              - containerPort: 8083
+                hostPort: 8083
             User: "root"
             Command:
               - bash
               - "-c"
               - |
-                export ENI_IP=`curl $ECS_CONTAINER_METADATA_URI_V4 | sed -e 's/.*IPv4Addresses":\["\(.*\)"\],"AttachmentIndex.*/\1/'` &&
-                echo "$ENI_IP localhost" > /etc/hosts &&
-                echo "export ENI_IP=$ENI_IP" >> /home/appuser/.bashrc
+                export CONNECT_REST_HOST_NAME=0.0.0.0
+                export CONNECT_REST_ADVERTISED_HOST_NAME=localhost
+
                 runuser -p appuser -c '''
-                  export HOME=/home/appuser &&
+                  export HOME=/home/appuser
                   source /home/appuser/.bashrc
-                  export CONNECT_REST_HOST_NAME=$ENI_IP &&
-                  export CONNECT_REST_ADVERTISED_HOST_NAME=$ENI_IP &&
-                  curl -k -SL -O "https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/1.9.2.Final/debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz" &&
-                  tar -xf debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz -C /usr/share/java &&
+
+                  curl -k -SL -O "https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/1.9.2.Final/debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz"
+                  tar -xf debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz -C /usr/share/java
                   /etc/confluent/docker/run
                 '''
             Environment:
@@ -402,7 +404,7 @@ resources:
               - "-c"
               - |
                 sleep infinity
-          - Name: connect-ui  # added new container def for kafka connect ui
+          - Name: connect-ui # added new container def for kafka connect ui
             Image: ${self:custom.connectUiImage}
             Memory: 4096
             Cpu: 2048
@@ -410,8 +412,8 @@ resources:
               - ContainerName: connect
                 Condition: START
             portMappings:
-             - containerPort: 8000
-               hostPort: 8000
+              - containerPort: 8000
+                hostPort: 8000
             Environment:
               - Name: CONNECT_URL
                 Value: http://localhost:8083
@@ -421,7 +423,7 @@ resources:
                 awslogs-region: !Ref AWS::Region
                 awslogs-group: !Ref KafkaConnectUiWorkerLogGroup
                 awslogs-stream-prefix: fargate
-                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,  
+                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
 
         Family: ${self:service}-${sls:stage}-kafka-connect-worker
         NetworkMode: awsvpc
