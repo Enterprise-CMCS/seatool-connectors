@@ -57,7 +57,7 @@ custom:
   brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
   dbInfo: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/dbInfo, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/dbInfo}
   connectImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/cp-kafka-connect:6.0.9"}
-  connectUiImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}/connectui, "landoop/kafka-connect-ui"} 
+  connectUiImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}/connectui, "landoop/kafka-connect-ui"}
   scripts:
     hooks:
       deploy:finalize: |
@@ -226,7 +226,7 @@ resources:
       Type: "AWS::Logs::LogGroup"
       Properties:
         LogGroupName: /aws/fargate/${self:service}-${sls:stage}-kafka-connect
-    KafkaConnectUiWorkerLogGroup: 
+    KafkaConnectUiWorkerLogGroup:
       Type: "AWS::Logs::LogGroup"
       Properties:
         LogGroupName: /aws/fargate/${self:service}-${sls:stage}-kafka-connect-ui
@@ -395,7 +395,7 @@ resources:
               - "-c"
               - |
                 sleep infinity
-          - Name: connect-ui 
+          - Name: connect-ui
             Image: ${self:custom.connectUiImage}
             Memory: 4096
             Cpu: 2048
@@ -425,7 +425,7 @@ resources:
         Memory: 8GB
         Cpu: 4096
         Tags:
-          - Key: ConditionalDependencyHack 
+          - Key: ConditionalDependencyHack
             Value:
               Fn::If:
                 - isDev
@@ -467,7 +467,7 @@ resources:
             - !Ref AWS::AccountId
           source:
             - "aws.ecs"
-            - "demo.cli" 
+            - "demo.cli"
           detail-type:
             - "ECS Task State Change"
           detail:
@@ -629,3 +629,4 @@ resources:
         The ID of the security group attached to the Kafka Connect cluster tasks.
         This can be used by other resources to attach additional ingress rules.
       Value: !Ref KafkaConnectWorkerSecurityGroup
+      
