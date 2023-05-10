@@ -235,17 +235,17 @@ resources:
       Properties:
         GroupDescription: Security Group for the Fargate Connect Workers.
         VpcId: ${self:custom.vpc.id}
-    KafkaConnectUiWorkerSecurityGroup:
-      Type: AWS::EC2::SecurityGroup
-      Properties:
-        GroupDescription: Security Group for the Fargate Connect Ui Workers.
-        VpcId: ${self:custom.vpc.id}
-    KafkaConnectUiWorkerSecurityGroupEgressLambda:
-      Type: AWS::EC2::SecurityGroupEgress
-      Properties:
-        GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
-        IpProtocol: -1
-        CidrIp: 0.0.0.0/0
+    # KafkaConnectUiWorkerSecurityGroup:
+    #   Type: AWS::EC2::SecurityGroup
+    #   Properties:
+    #     GroupDescription: Security Group for the Fargate Connect Ui Workers.
+    #     VpcId: ${self:custom.vpc.id}
+    # KafkaConnectUiWorkerSecurityGroupEgressLambda:
+    #   Type: AWS::EC2::SecurityGroupEgress
+    #   Properties:
+    #     GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
+    #     IpProtocol: -1
+    #     CidrIp: 0.0.0.0/0
     KafkaConnectWorkerSecurityGroupEgressLambda:
       Type: AWS::EC2::SecurityGroupEgress
       Properties:
@@ -268,22 +268,22 @@ resources:
         FromPort: 8083
         ToPort: 8083
         SourceSecurityGroupId: !Ref KafkaConnectWorkerSecurityGroup
-    KafkaConnectUiWorkerSecurityGroupIngressLambda:
-      Type: AWS::EC2::SecurityGroupIngress
-      Properties:
-        GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
-        IpProtocol: tcp
-        FromPort: 8000
-        ToPort: 8000
-        SourceSecurityGroupId: !Ref LambdaConfigureConnectorsSecurityGroup
-    KafkaConnectUiWorkerSecurityGroupIngressCluster:
-      Type: AWS::EC2::SecurityGroupIngress
-      Properties:
-        GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
-        IpProtocol: tcp
-        FromPort: 8000
-        ToPort: 8000
-        SourceSecurityGroupId: !Ref KafkaConnectUiWorkerSecurityGroup
+    # KafkaConnectUiWorkerSecurityGroupIngressLambda:
+    #   Type: AWS::EC2::SecurityGroupIngress
+    #   Properties:
+    #     GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
+    #     IpProtocol: tcp
+    #     FromPort: 8000
+    #     ToPort: 8000
+    #     SourceSecurityGroupId: !Ref LambdaConfigureConnectorsSecurityGroup
+    # KafkaConnectUiWorkerSecurityGroupIngressCluster:
+    #   Type: AWS::EC2::SecurityGroupIngress
+    #   Properties:
+    #     GroupId: !Ref KafkaConnectUiWorkerSecurityGroup
+    #     IpProtocol: tcp
+    #     FromPort: 8000
+    #     ToPort: 8000
+    #     SourceSecurityGroupId: !Ref KafkaConnectUiWorkerSecurityGroup
     KafkaConnectWorkerRole:
       Type: "AWS::IAM::Role"
       Properties:
