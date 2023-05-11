@@ -361,7 +361,7 @@ resources:
                 awslogs-stream-prefix: fargate
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
           - Name: instantclient
-            Image: "ghcr.io/oracle/oraclelinux8-instantclient:21"
+            Image: "mcr.microsoft.com/mssql-tools"
             Memory: 2048
             Command:
               - bash
