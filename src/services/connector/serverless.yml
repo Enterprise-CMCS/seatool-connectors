@@ -16,7 +16,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs16.x
+  runtime: nodejs18.x
   region: ${env:REGION_A}
   stackTags:
     PROJECT: ${self:custom.project}
@@ -57,6 +57,7 @@ custom:
   brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
   dbInfo: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/dbInfo, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/dbInfo}
   connectImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/cp-kafka-connect:6.0.9"}
+  connectUiImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}/connectui, "landoop/kafka-connect-ui"}
   scripts:
     hooks:
       deploy:finalize: |
@@ -72,14 +73,18 @@ custom:
         for task in "${runningTasks[@]}"
         do
           echo """
-          To conect to the connector, run:
+          To forward the connector's Kafka Connect REST API to your localhost:8083, run:
+          ecs-exec-pf -c ${self:service}-${sls:stage}-connect -t ${task##*/} -p 8083 -l 8083
+          To forward the connector's Kafka Connect Ui to your localhost:8000, run:
+          ecs-exec-pf -c ${self:service}-${sls:stage}-connect -t ${task##*/} -p 8000 -l 8000
+          To connect to the connector, run:
           aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container connect --interactive --command "/bin/sh"
-
+          To connect to the connect-ui, run:
+          aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container connect-ui --interactive --command "/bin/sh"
           To connect to the sql instantclient, run:
           aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container instantclient --interactive --command "/bin/sh"
           """
         done
-
 params:
   master:
     topicNamespace: ""
@@ -139,7 +144,6 @@ functions:
         - Ref: LambdaConfigureConnectorsSecurityGroup
       subnetIds: >-
         ${self:custom.vpc.privateSubnets}
-
 resources:
   Conditions:
     isDev:
@@ -222,6 +226,10 @@ resources:
       Type: "AWS::Logs::LogGroup"
       Properties:
         LogGroupName: /aws/fargate/${self:service}-${sls:stage}-kafka-connect
+    KafkaConnectUiWorkerLogGroup:
+      Type: "AWS::Logs::LogGroup"
+      Properties:
+        LogGroupName: /aws/fargate/${self:service}-${sls:stage}-kafka-connect-ui
     KafkaConnectWorkerSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
@@ -288,16 +296,23 @@ resources:
             Image: ${self:custom.connectImage}
             Memory: 4096
             Cpu: 2048
+            portMappings:
+              - containerPort: 8083
+                hostPort: 8083
+            User: "root"
             Command:
               - bash
               - "-c"
               - |
-                export CONNECT_REST_HOST_NAME=`curl $ECS_CONTAINER_METADATA_URI_V4 | sed -e 's/.*IPv4Addresses":\["\(.*\)"\],"AttachmentIndex.*/\1/'` &&
-                export CONNECT_REST_ADVERTISED_HOST_NAME=$CONNECT_REST_HOST_NAME &&
-                echo "export SELF=$CONNECT_REST_HOST_NAME" >> ~/.bashrc &&
-                curl -k -SL -O "https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/1.9.2.Final/debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz" &&
-                tar -xf debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz -C /usr/share/java &&
-                /etc/confluent/docker/run
+                export CONNECT_REST_HOST_NAME=0.0.0.0
+                export CONNECT_REST_ADVERTISED_HOST_NAME=localhost
+                runuser -p appuser -c '''
+                  export HOME=/home/appuser
+                  source /home/appuser/.bashrc
+                  curl -k -SL -O "https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/1.9.2.Final/debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz"
+                  tar -xf debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz -C /usr/share/java
+                  /etc/confluent/docker/run
+                '''
             Environment:
               - Name: CONNECT_BOOTSTRAP_SERVERS
                 Value: >-
@@ -347,22 +362,43 @@ resources:
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
           - Name: instantclient
             Image: "ghcr.io/oracle/oraclelinux8-instantclient:21"
-            Memory: 2048 # This will kill the instantclient container if it goes over 2048, to preserve the connector container.
+            Memory: 2048
             Command:
               - bash
               - "-c"
               - |
                 sleep infinity
+          - Name: connect-ui
+            Image: ${self:custom.connectUiImage}
+            Memory: 4096
+            Cpu: 2048
+            DependsOn:
+              - ContainerName: connect
+                Condition: START
+            portMappings:
+              - containerPort: 8000
+                hostPort: 8000
+            Environment:
+              - Name: CONNECT_URL
+                Value: http://localhost:8083
+            LogConfiguration:
+              LogDriver: awslogs
+              Options:
+                awslogs-region: !Ref AWS::Region
+                awslogs-group: !Ref KafkaConnectUiWorkerLogGroup
+                awslogs-stream-prefix: fargate
+                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
+
         Family: ${self:service}-${sls:stage}-kafka-connect-worker
         NetworkMode: awsvpc
         ExecutionRoleArn: !GetAtt KafkaConnectWorkerRole.Arn
         TaskRoleArn: !GetAtt KafkaConnectWorkerRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: 4GB
-        Cpu: 2048
+        Memory: 8GB
+        Cpu: 4096
         Tags:
-          - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
+          - Key: ConditionalDependencyHack
             Value:
               Fn::If:
                 - isDev
@@ -404,7 +440,7 @@ resources:
             - !Ref AWS::AccountId
           source:
             - "aws.ecs"
-            - "demo.cli" # used to test events from the command line
+            - "demo.cli"
           detail-type:
             - "ECS Task State Change"
           detail:

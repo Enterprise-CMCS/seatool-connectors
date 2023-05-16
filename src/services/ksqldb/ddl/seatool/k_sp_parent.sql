@@ -109,23 +109,26 @@ CREATE TABLE IF NOT EXISTS K_seatool_agg_OCD_Review
  GROUP BY sp.ID_Number
 EMIT CHANGES;
 
-
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_Officers
  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.ksqldb.seatool.tld.SP_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
- SELECT payload->after->ID_Number,
-        payload->after->RO_Analyst_ID,
-        payload->after->Backup_Program_Analyst_ID,
-        payload->after->Backup_FM_Analyst_ID,
-        payload->after->Lead_Analyst_ID,
+ SELECT payload->after->ID_Number ,
+        ifnull(payload->after->RO_Analyst_ID, -1) RO_Analyst_ID,
+        ifnull(payload->after->Backup_Program_Analyst_ID, -1) Backup_Program_Analyst_ID,
+        ifnull(payload->after->Backup_FM_Analyst_ID, -1) Backup_FM_Analyst_ID,
+        ifnull(payload->after->Lead_Analyst_ID, -1) Lead_Analyst_ID,
         STRUCT (
-         ID_Number := LATEST_BY_OFFSET(payload->after->ID_Number,FALSE),
-         RO_Analyst_ID := LATEST_BY_OFFSET(payload->after->RO_Analyst_ID,FALSE),
-         Backup_Program_Analyst_ID := LATEST_BY_OFFSET(payload->after->Backup_Program_Analyst_ID,FALSE),
-         Backup_FM_Analyst_ID := LATEST_BY_OFFSET(payload->after->Backup_FM_Analyst_ID,FALSE),
-         Lead_Analyst_ID := LATEST_BY_OFFSET(payload->after->Lead_Analyst_ID,FALSE)
-        ) SP_Officer
+          ID_Number := LATEST_BY_OFFSET(payload->after->ID_Number,FALSE),
+          RO_Analyst_ID := LATEST_BY_OFFSET(payload->after->RO_Analyst_ID,FALSE),
+          Backup_Program_Analyst_ID := LATEST_BY_OFFSET(payload->after->Backup_Program_Analyst_ID,FALSE),
+          Backup_FM_Analyst_ID := LATEST_BY_OFFSET(payload->after->Backup_FM_Analyst_ID,FALSE),
+          Lead_Analyst_ID := LATEST_BY_OFFSET(payload->after->Lead_Analyst_ID,FALSE)
+         ) SP_Officer
    FROM K_seatool_State_Plan_stream sp
- GROUP BY payload->after->ID_Number, payload->after->RO_Analyst_ID, payload->after->Backup_Program_Analyst_ID, payload->after->Backup_FM_Analyst_ID, payload->after->Lead_Analyst_ID
+ GROUP BY payload->after->ID_Number,
+       ifnull(payload->after->RO_Analyst_ID, -1),
+       ifnull(payload->after->Backup_Program_Analyst_ID, -1),
+       ifnull(payload->after->Backup_FM_Analyst_ID, -1),
+       ifnull(payload->after->Lead_Analyst_ID, -1)
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_RO_Analyst_Officers
