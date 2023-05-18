@@ -7,12 +7,13 @@ permalink: /
 ---
 
 # seatool-connectors
+
 {: .fs-9 }
 
 The seatool-connectors project streams CMS SEA Tool data to CMS Bigmac.
 {: .fs-6 .fw-300 }
 
-[Join us on Slack](https://cmsgov.slack.com/archives/C047RBDL396){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [View it on GitHub](https://github.com/cmsgov/seatool-connectors){: .btn .fs-5 .mb-4 .mb-md-0 }
+[Join us on Slack](https://cmsgov.slack.com/archives/C047RBDL396){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [View it on GitHub](https://github.com/Enterprise-CMCS/seatool-connectors){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ---
 
@@ -20,7 +21,7 @@ The seatool-connectors project streams CMS SEA Tool data to CMS Bigmac.
 
 The seatool-connectors project is a microservice that sends CMS SEA Tool data to CMS Bigmac.
 
-This project is under active development by the MACPRO Platform team.  Read on for more details, and feel free to join us on [Slack](https://cmsgov.slack.com/archives/C047RBDL396).
+This project is under active development by the MACPRO Platform team. Read on for more details, and feel free to join us on [Slack](https://cmsgov.slack.com/archives/C047RBDL396).
 
 Thanks, and we're glad you're here!
 
@@ -29,7 +30,6 @@ Thanks, and we're glad you're here!
 ## About the project
 
 The seatool-connectors project is a work of the MACPRO Platform Team for the [Centers for Medicare & Medicaid Services (CMS)](https://www.cms.gov/).
-
 
 #### Thank you to the contributors of seatool-connectors!
 
