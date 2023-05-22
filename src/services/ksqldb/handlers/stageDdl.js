@@ -1,5 +1,5 @@
 import { send, SUCCESS, FAILED } from "cfn-response-async";
-var fs = require("fs");
+import fs from "fs";
 import archiver from "archiver";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 exports.handler = async function (event, context) {
@@ -7,7 +7,6 @@ exports.handler = async function (event, context) {
   const responseData = {};
   let responseStatus = SUCCESS;
   try {
-    console.log("mike");
     console.log(event.ResourceProperties.LayerVersion);
     if (event.RequestType === "Create" || event.RequestType == "Update") {
       let outFileName = `${context.awsRequestId}.zip`;

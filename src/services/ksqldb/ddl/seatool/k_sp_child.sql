@@ -1,6 +1,5 @@
 SET 'auto.offset.reset' = 'earliest';
 
-
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Action_Officers
   WITH (KAFKA_TOPIC='${param:topicNamespace}aws.ksqldb.seatool.agg.Action_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT ao.pk->payload->ID_Number, 
