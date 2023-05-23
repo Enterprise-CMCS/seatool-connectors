@@ -211,7 +211,7 @@ resources:
                 wget https://ksqldb-maven.s3-us-west-2.amazonaws.com/maven/io/confluent/ksql/ksql-rocksdb-config-setter/0.7.1/ksql-rocksdb-config-setter-0.7.1.jar -O /usr/share/java/ksqldb-rest-app/ksql-rocksdb-config-setter-0.7.1.jar &&
                 echo "ksql.streams.rocksdb.config.setter=io.confluent.ksql.rocksdb.KsqlBoundedMemoryRocksDBConfigSetter" >> /etc/ksqldb/ksqldb-server.properties &&
                 echo "ksql.plugins.rocksdb.cache.size={param:rocksdbCache}" >> /etc/ksqldb/ksqldb-server.properties &&
-                echo "ksql.plugins.rocksdb.write.buffer.cache.use=true" >> /etc/ksqldb/ksqldb-server.prop erties &&
+                echo "ksql.plugins.rocksdb.write.buffer.cache.use=true" >> /etc/ksqldb/ksqldb-server.properties &&
                 echo "ksql.plugins.rocksdb.num.background.threads=1" >> /etc/ksqldb/ksqldb-server.properties &&
                 /usr/bin/docker/run
             Environment:
