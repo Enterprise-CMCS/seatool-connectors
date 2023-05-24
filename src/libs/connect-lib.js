@@ -61,9 +61,7 @@ export async function putConnectors(cluster, service, connectors) {
     hostname: workerIp,
   });
   for (var i = 0; i < connectors.length; i++) {
-    console.log(
-      `Putting connector with config: ${JSON.stringify(connectors[i], null, 2)}`
-    );
+    console.log(`Putting connector:  ${connectors[i].name}`);
     //This won't account for multiple tasks with multiple interfaces
     await connectRestApiWithRetry({
       hostname: workerIp,
@@ -79,7 +77,7 @@ export async function restartConnectors(cluster, service, connectors) {
   for (var i = 0; i < connectors.length; i++) {
     let connector = _.omit(connectors[i], "config");
     connector.tasks = connectors[i].config["tasks.max"];
-    console.log(`Restarting connector: ${JSON.stringify(connector, null, 2)}`);
+    console.log(`Restarting connector:  ${connectors[i].name}`);
     //This won't account for multiple tasks with multiple interfaces
     await connectRestApiWithRetry({
       hostname: workerIp,
