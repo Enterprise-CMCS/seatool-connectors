@@ -2045,7 +2045,7 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
-"@enterprise-cmcs/macpro-security-hub-sync@^1.5.0":
+"@enterprise-cmcs/macpro-security-hub-sync@^1.5.3":
   version "1.5.3"
   resolved "https://registry.yarnpkg.com/@enterprise-cmcs/macpro-security-hub-sync/-/macpro-security-hub-sync-1.5.3.tgz#6cc25cb55a1197bfb352d9cc29570751e3d58d3b"
   integrity sha512-ykBgW4EXrMK4nix3mHCyLbAR1gJCsBXn06B/zg8g/elF0/VEs3AgoJObLUwN70pYMy2AHfCgNyhcOI1Lqu+5qg==
