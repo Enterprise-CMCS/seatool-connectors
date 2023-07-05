@@ -31,3 +31,9 @@ The seatool-connectors project is a microservice that sends CMS SEA Tool data to
 ## View Metrics
 
 [Metrics](https://Enterprise-CMCS.github.io/seatool-connectors/dora/)
+
+We programmatically publish a set of Development metrics that align to the DevOps Research and Assesment (DORA) standards.  Those metrics can be viewed [here]({{ site.url }}{{ site.repo.name }}/metrics/dora).
+
+## AWS Resources
+
+You can view and download a list of all aws resources this project uses for higher environments [here]({{ site.url }}{{ site.repo.name }}/metrics/aws).
