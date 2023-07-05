@@ -442,7 +442,7 @@ resources:
       Type: AWS::CloudWatch::Alarm
       Properties:
         AlarmName: ${self:service}-${sls:stage}-ksqldbHeadlessService-CPUUtilization
-        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 75%"
+        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 80%"
         Namespace: AWS/ECS
         MetricName: CPUUtilization
         Dimensions:
@@ -451,9 +451,9 @@ resources:
           - Name: ServiceName
             Value: !GetAtt ksqldbHeadlessService.Name
         Statistic: Average
-        Period: 60
-        EvaluationPeriods: 2
-        Threshold: 75
+        Period: 300
+        EvaluationPeriods: 3
+        Threshold: 80
         ComparisonOperator: GreaterThanOrEqualToThreshold
         AlarmActions:
           - ${param:ecsFailureTopicArn}
@@ -484,7 +484,7 @@ resources:
       Type: AWS::CloudWatch::Alarm
       Properties:
         AlarmName: ${self:service}-${sls:stage}-ksqldbIntService-CPUUtilization
-        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 75%"
+        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 80%"
         Namespace: AWS/ECS
         MetricName: CPUUtilization
         Dimensions:
@@ -493,9 +493,9 @@ resources:
           - Name: ServiceName
             Value: !GetAtt ksqldbIntService.Name
         Statistic: Average
-        Period: 60
-        EvaluationPeriods: 2
-        Threshold: 75
+        Period: 300
+        EvaluationPeriods: 3
+        Threshold: 80
         ComparisonOperator: GreaterThanOrEqualToThreshold
         AlarmActions:
           - ${param:ecsFailureTopicArn}
