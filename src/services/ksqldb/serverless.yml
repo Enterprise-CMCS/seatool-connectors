@@ -494,8 +494,8 @@ resources:
             Value: !GetAtt ksqldbIntService.Name
         Statistic: Average
         Period: 60
-        EvaluationPeriods: 2
-        Threshold: 75
+        EvaluationPeriods: 5
+        Threshold: 80
         ComparisonOperator: GreaterThanOrEqualToThreshold
         AlarmActions:
           - ${param:ecsFailureTopicArn}
