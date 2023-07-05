@@ -451,8 +451,8 @@ resources:
           - Name: ServiceName
             Value: !GetAtt ksqldbHeadlessService.Name
         Statistic: Average
-        Period: 60
-        EvaluationPeriods: 5
+        Period: 300
+        EvaluationPeriods: 3
         Threshold: 80
         ComparisonOperator: GreaterThanOrEqualToThreshold
         AlarmActions:
@@ -493,8 +493,8 @@ resources:
           - Name: ServiceName
             Value: !GetAtt ksqldbIntService.Name
         Statistic: Average
-        Period: 60
-        EvaluationPeriods: 5
+        Period: 300
+        EvaluationPeriods: 3
         Threshold: 80
         ComparisonOperator: GreaterThanOrEqualToThreshold
         AlarmActions:
