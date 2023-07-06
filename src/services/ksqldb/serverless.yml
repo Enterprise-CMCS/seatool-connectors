@@ -24,6 +24,13 @@ provider:
     role:
       path: /delegatedadmin/developer/
       permissionsBoundary: arn:aws:iam::${aws:accountId}:policy/cms-cloud-admin/developer-boundary-policy
+      statements:
+        - Effect: "Allow"
+          Action:
+            - s3:PutObject
+          Resource:
+            - !Sub "${DdlBucket.Arn}"
+            - !Sub "${DdlBucket.Arn}/*"
 
 custom:
   project: ${env:PROJECT}
@@ -41,8 +48,8 @@ custom:
       package:initialize: |
         set -e
         set -x
-        echo "${self:custom.headlessSqlContents}" > combined.sql
-        zip combined.sql.zip combined.sql
+        mkdir -p .ddl
+        echo "${self:custom.headlessSqlContents}" > .ddl/combined.sql
     commands:
       connect: |
         runningInteractiveTasks=(`aws --region ${self:provider.region} ecs list-tasks --cluster ${self:service}-${sls:stage}-connect --service-name ksqldb-interactive --desired-status RUNNING | jq -r ".taskArns[]"`)
@@ -78,16 +85,19 @@ params:
     topicNamespace: --${self:custom.project}--${sls:stage}--
 
 layers:
-  dummy:
-    name: dummy-${sls:stage}
-    package:
-      artifact: combined.sql.zip
+  ddl:
+    name: ${self:service}-${sls:stage}
+    path: ./.ddl
 
 functions:
-  dummyFunc:
-    handler: handlers/dummy.myHandler
+  stageDdl:
+    handler: handlers/stageDdl.handler
     layers:
-      - !Ref DummyLambdaLayer
+      - !Ref DdlLambdaLayer
+    timeout: 900
+    maximumRetryAttempts: 0
+    environment:
+      ddlBucket: !Ref DdlBucket
   cleanupKafka:
     handler: handlers/cleanupKafka.handler
     vpc:
@@ -105,6 +115,13 @@ resources:
             - ${param:topicNamespace}
             - ""
   Resources:
+    StageDdl:
+      Type: AWS::CloudFormation::CustomResource
+      Properties:
+        ServiceToken: !GetAtt StageDdlLambdaFunction.Arn
+        DdlBucket: !Ref DdlBucket
+        TopicNamespace: ${param:topicNamespace}
+        LayerVersion: !Ref DdlLambdaLayer
     ksqldbHeadlessLogGroup:
       Type: "AWS::Logs::LogGroup"
       Properties:
@@ -187,10 +204,8 @@ resources:
                 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" &&
                 unzip awscliv2.zip &&
                 ./aws/install &&
-                KEY=`aws s3 ls $DEPLOYMENT_BUCKET --recursive | exec grep 'combined.sql.zip' | sort | tail -n 1 | awk '{print $4}'` &&
-                echo $BUCKET $KEY
-                aws s3 cp s3://$DEPLOYMENT_BUCKET/$KEY . &&
-                unzip combined.sql.zip &&
+                aws s3 cp s3://$DDL_BUCKET/$DDL_KEY . &&
+                unzip $DDL_KEY &&
                 mv combined.sql /home/appuser/headless.sql &&
                 cat /home/appuser/headless.sql &&
                 wget https://ksqldb-maven.s3-us-west-2.amazonaws.com/maven/io/confluent/ksql/ksql-rocksdb-config-setter/0.7.1/ksql-rocksdb-config-setter-0.7.1.jar -O /usr/share/java/ksqldb-rest-app/ksql-rocksdb-config-setter-0.7.1.jar &&
@@ -200,8 +215,10 @@ resources:
                 echo "ksql.plugins.rocksdb.num.background.threads=1" >> /etc/ksqldb/ksqldb-server.properties &&
                 /usr/bin/docker/run
             Environment:
-              - Name: KSQL_LISTENERS
-                Value: "http://0.0.0.0:8088"
+              - Name: DDL_BUCKET
+                Value: !Ref DdlBucket
+              - Name: DDL_KEY
+                Value: !GetAtt StageDdl.S3Key
               - Name: KSQL_BOOTSTRAP_SERVERS
                 Value: "${self:custom.brokerString}"
               - Name: KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE
@@ -230,8 +247,6 @@ resources:
                 Value: 2147483647
               - Name: KSQL_KSQL_STREAMS_PRODUCER_MAX_BLOCK_MS
                 Value: 9223372036854774000
-              - Name: DEPLOYMENT_BUCKET
-                Value: !Ref ServerlessDeploymentBucket
               - Name: KSQL_CLASSPATH
                 Value: "/usr/share/java/ksqldb-rest-app/*"
               - Name: KSQL_HEAP_OPTS
@@ -251,7 +266,8 @@ resources:
           - FARGATE
         Memory: ${param:memory}
         Cpu: ${param:cpu}
-        EphemeralStorage: 200
+        EphemeralStorage:
+          SizeInGiB: 200
         Tags:
           - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
             Value:
@@ -379,9 +395,10 @@ resources:
         TaskRoleArn: !GetAtt ksqldbHeadlessRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: 4096
-        Cpu: 2048
-        EphemeralStorage: 50
+        Memory: ${param:memory}
+        Cpu: ${param:cpu}
+        EphemeralStorage:
+          SizeInGiB: 50
         Tags:
           - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
             Value:
@@ -425,7 +442,7 @@ resources:
       Type: AWS::CloudWatch::Alarm
       Properties:
         AlarmName: ${self:service}-${sls:stage}-ksqldbHeadlessService-CPUUtilization
-        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 75%"
+        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 80%"
         Namespace: AWS/ECS
         MetricName: CPUUtilization
         Dimensions:
@@ -434,9 +451,9 @@ resources:
           - Name: ServiceName
             Value: !GetAtt ksqldbHeadlessService.Name
         Statistic: Average
-        Period: 60
-        EvaluationPeriods: 2
-        Threshold: 75
+        Period: 300
+        EvaluationPeriods: 3
+        Threshold: 80
         ComparisonOperator: GreaterThanOrEqualToThreshold
         AlarmActions:
           - ${param:ecsFailureTopicArn}
@@ -467,7 +484,7 @@ resources:
       Type: AWS::CloudWatch::Alarm
       Properties:
         AlarmName: ${self:service}-${sls:stage}-ksqldbIntService-CPUUtilization
-        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 75%"
+        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 80%"
         Namespace: AWS/ECS
         MetricName: CPUUtilization
         Dimensions:
@@ -476,9 +493,9 @@ resources:
           - Name: ServiceName
             Value: !GetAtt ksqldbIntService.Name
         Statistic: Average
-        Period: 60
-        EvaluationPeriods: 2
-        Threshold: 75
+        Period: 300
+        EvaluationPeriods: 3
+        Threshold: 80
         ComparisonOperator: GreaterThanOrEqualToThreshold
         AlarmActions:
           - ${param:ecsFailureTopicArn}
@@ -516,3 +533,11 @@ resources:
         GroupId: !Ref LambdaSecurityGroup
         IpProtocol: -1
         CidrIp: 0.0.0.0/0
+    DdlBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: !Sub ${self:service}-${sls:stage}-ddl-${AWS::AccountId}
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
