@@ -10,8 +10,8 @@
   <a href="https://codeclimate.com/github/Enterprise-CMCS/seatool-connectors/maintainability">
     <img src="https://api.codeclimate.com/v1/badges/d23421cdd24aea696605/maintainability" />
   </a>
-  <a href="https://dependabot.com/">
-    <img alt="Dependabot" src="https://badgen.net/badge/Dependabot/enabled/green?icon=dependabot">
+  <a href="https://snyk.io/">
+    <img alt="Snyk" src="https://img.shields.io/badge/Snyk-protected-purple">
   </a>
   <a href="https://github.com/prettier/prettier">
     <img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square">
