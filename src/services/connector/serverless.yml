@@ -211,6 +211,9 @@ resources:
         TopicPatternsToDelete:
           - ${param:topicNamespace}aws.seatool.cmcs*
           - ${param:topicNamespace}mgmt.connect.${self:service}*
+      DependsOn:
+        - LambdaSecurityGroupEgress
+
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:

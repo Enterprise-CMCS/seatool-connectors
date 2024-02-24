@@ -128,6 +128,7 @@ resources:
         LogGroupName: /aws/fargate/${self:service}-${sls:stage}-ksqldb-headless
     ksqldbSecurityGroup:
       Type: AWS::EC2::SecurityGroup
+      DeletionPolicy: Retain
       Properties:
         GroupDescription: Security Group for the Fargate
         VpcId: ${self:custom.vpc.id}
@@ -439,6 +440,8 @@ resources:
           - ${param:topicNamespace}aws.ksqldb.seatool.tld*
           - _confluent-ksql-${param:topicNamespace}${self:service}-*
           - ${param:topicNamespace}${self:service}*
+      DependsOn:
+        - LambdaSecurityGroupEgress
 
     ksqldbHeadlessServiceECSCpuAlarm:
       Type: AWS::CloudWatch::Alarm
@@ -526,6 +529,7 @@ resources:
           - ${param:ecsFailureTopicArn}
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
+      DeletionPolicy: Retain
       Properties:
         GroupDescription: Security Group for the topics lambda function
         VpcId: ${self:custom.vpc.id}
