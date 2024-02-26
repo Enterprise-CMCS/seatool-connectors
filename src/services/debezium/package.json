@@ -1,0 +1,10 @@
+{
+  "name": "connector",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "cfn-response-async": "^1.0.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {}
+}

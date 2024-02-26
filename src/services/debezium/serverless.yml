@@ -1,4 +1,4 @@
-service: ${self:custom.project}-connector
+service: ${self:custom.project}-debezium
 
 frameworkVersion: "3"
 
@@ -56,8 +56,8 @@ custom:
   vpc: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/vpc, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/vpc}
   brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
   dbInfo: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/dbInfo, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/dbInfo}
-  connectImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/cp-kafka-connect:6.0.9"}
-  connectUiImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}/connectui, "landoop/kafka-connect-ui"}
+  connectImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/seatool-connector, "confluentinc/cp-kafka-connect:6.0.9"}
+  connectUiImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/seatool-connector/connectui, "landoop/kafka-connect-ui"}
   scripts:
     hooks:
       deploy:finalize: |
@@ -158,50 +158,50 @@ resources:
         ServiceToken: !GetAtt CreateTopicsLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
         TopicsToCreate:
-          - name: ${param:topicNamespace}aws.seatool.cmcs
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbHistory
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Action_Officers
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Action_Types
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.aspnet_Users
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Call_Held_Reasons
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Code_After_Init_Assess
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Column_Definition
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Components_StatePlans
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Components
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Early_Alert_Field_Types
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Early_Alert_Fields
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Email
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.EmailDistribution
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Holiday
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.OCD_Review
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Officers
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Plan_Types
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Position
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Priority_Codes
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Priority_Complexity
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Priority_Review_Position
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.RAI
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Region_Access
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Region
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.SPA_Type
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.SPW_Status
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_1115_State_PN
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_1115_TE
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_1115
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_APD_Sub_Type
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_APD
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Early_Alerts
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Impact_Funding
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.States_Officer_Represents
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.States
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Stop_Resume_Dates
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Sub_Type
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Table_Definition
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Title_Type
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.Type
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_Types
-          - name: ${param:topicNamespace}aws.seatool.cmcs.dbo.State_Plan_Service_SubTypes
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.dbHistory
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Action_Officers
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Action_Types
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.aspnet_Users
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Call_Held_Reasons
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Code_After_Init_Assess
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Column_Definition
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Components_StatePlans
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Components
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Early_Alert_Field_Types
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Early_Alert_Fields
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Email
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.EmailDistribution
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Holiday
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.OCD_Review
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Officers
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Plan_Types
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Position
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Priority_Codes
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Priority_Complexity
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Priority_Review_Position
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.RAI
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Region_Access
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Region
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.SPA_Type
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.SPW_Status
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan_1115_State_PN
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan_1115_TE
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan_1115
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan_APD_Sub_Type
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan_APD
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan_Early_Alerts
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan_Impact_Funding
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.States_Officer_Represents
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.States
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Stop_Resume_Dates
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Sub_Type
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Table_Definition
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Title_Type
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Type
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan_Service_Types
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan_Service_SubTypes
     CleanupTopics:
       Type: AWS::CloudFormation::CustomResource
       Condition: isDev # We only clean up topics in lower environments where isDev is true
@@ -209,11 +209,10 @@ resources:
         ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
         TopicPatternsToDelete:
-          - ${param:topicNamespace}aws.seatool.cmcs*
+          - ${param:topicNamespace}aws.seatool.debezium.cdc*
           - ${param:topicNamespace}mgmt.connect.${self:service}*
       DependsOn:
         - LambdaSecurityGroupEgress
-
     LambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
@@ -312,8 +311,8 @@ resources:
                 runuser -p appuser -c '''
                   export HOME=/home/appuser
                   source /home/appuser/.bashrc
-                  curl -k -SL -O "https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/1.9.2.Final/debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz"
-                  tar -xf debezium-connector-sqlserver-1.9.2.Final-plugin.tar.gz -C /usr/share/java
+                  curl -k -SL -O "https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/2.5.1.Final/debezium-connector-sqlserver-2.5.1.Final-plugin.tar.gz"
+                  tar -xf debezium-connector-sqlserver-2.5.1.Final-plugin.tar.gz -C /usr/share/java
                   /etc/confluent/docker/run
                 '''
             Environment:
