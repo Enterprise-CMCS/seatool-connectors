@@ -1,13 +1,23 @@
 services:
   alerts:
     path: src/services/alerts
-  connector:
-    path: src/services/connector
-    params:
-      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
-  ksqldb:
-    path: src/services/ksqldb
-    params:
-      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+  # connector:
+  #   path: src/services/connector
+  #   params:
+  #     ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+  # ksqldb:
+  #   path: src/services/ksqldb
+  #   params:
+  #     ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
   dashboard:
     path: src/services/dashboard
+  debezium:
+    path: src/services/debezium
+    params:
+      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+  ksqlom:
+    path: src/services/ksqlom
+    params:
+      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+    # dependsOn:
+    #   - debezium
