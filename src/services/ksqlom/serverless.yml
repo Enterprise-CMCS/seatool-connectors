@@ -79,17 +79,11 @@ params:
     memory: 32768
     rocksdbCache: 11453246122
     topicNamespace: ""
-  # default:
-  #   cpu: 2048
-  #   heap: "-Xms4G -Xmx4G"
-  #   memory: 8192
-  #   rocksdbCache: 2147483648
-  #   topicNamespace: --${self:custom.project}--${sls:stage}--
   default:
-    cpu: 16384
-    heap: "-Xms15G -Xmx15G"
-    memory: 32768
-    rocksdbCache: 11453246122
+    cpu: 2048
+    heap: "-Xms4G -Xmx4G"
+    memory: 8192
+    rocksdbCache: 2147483648
     topicNamespace: --${self:custom.project}--${sls:stage}--
 
 layers:
