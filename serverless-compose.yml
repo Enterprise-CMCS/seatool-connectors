@@ -11,3 +11,13 @@ services:
       ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
   dashboard:
     path: src/services/dashboard
+  debezium:
+    path: src/services/debezium
+    params:
+      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+  ksqlom:
+    path: src/services/ksqlom
+    params:
+      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+    dependsOn:
+      - debezium
