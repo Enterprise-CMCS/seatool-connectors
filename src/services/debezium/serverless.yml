@@ -202,6 +202,9 @@ resources:
           - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.Type
           - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan_Service_Types
           - name: ${param:topicNamespace}aws.seatool.debezium.cdc.SEA.dbo.State_Plan_Service_SubTypes
+          - name: ${param:topicNamespace}aws.seatool.debezium.changed_date
+          - name: ${param:topicNamespace}aws.seatool.debezium.changed_date.dbHistory
+          - name: ${param:topicNamespace}aws.seatool.debezium.changed_date.SEA.dbo.State_Plan
     CleanupTopics:
       Type: AWS::CloudFormation::CustomResource
       Condition: isDev # We only clean up topics in lower environments where isDev is true
@@ -210,6 +213,7 @@ resources:
         BrokerString: ${self:custom.brokerString}
         TopicPatternsToDelete:
           - ${param:topicNamespace}aws.seatool.debezium.cdc*
+          - ${param:topicNamespace}aws.seatool.debezium.changed_date*
           - ${param:topicNamespace}mgmt.connect.${self:service}*
       DependsOn:
         - LambdaSecurityGroupEgress

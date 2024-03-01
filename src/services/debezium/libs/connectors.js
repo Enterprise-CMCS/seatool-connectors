@@ -25,4 +25,28 @@ export const connectors = [
       "poll.interval.ms": 200,
     },
   },
+  {
+    name: "aws.seatool.debezium.changed_date",
+    config: {
+      "connector.class": "io.debezium.connector.sqlserver.SqlServerConnector",
+      "database.hostname": process.env.legacydbIp,
+      "database.port": process.env.legacydbPort,
+      "database.user": process.env.legacydbUser,
+      "database.password": process.env.legacydbPassword,
+      "database.names": "SEA",
+      "topic.prefix": `${process.env.topicNamespace}aws.seatool.debezium.changed_date`,
+      "database.server.name": `${process.env.topicNamespace}aws.seatool.debezium.changed_date`,
+      "table.include.list": "dbo.State_Plan",
+      "column.include.list":
+        "dbo.State_Plan.ID_Number,dbo.State_Plan.Changed_Date",
+      "skip.messages.without.change": true,
+      "schema.history.internal.kafka.topic": `${process.env.topicNamespace}aws.seatool.debezium.changed_date.dbHistory`,
+      "schema.history.internal.kafka.bootstrap.servers":
+        process.env.bootstrapBrokerStringTls,
+      "schema.history.internal.producer.security.protocol": "SSL",
+      "schema.history.internal.consumer.security.protocol": "SSL",
+      "decimal.handling.mode": "double",
+      "database.encrypt": false,
+    },
+  },
 ];
