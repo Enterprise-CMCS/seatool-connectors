@@ -361,6 +361,7 @@ CREATE STREAM IF NOT EXISTS K_seatool_State_Plan_stream (
     Budget_Neutrality_Status_Memo varchar,
     Budget_Impact boolean,
     Budget_Impact_Value varchar,
+    Changed_Date timestamp,
     SPA_Type_ID integer,
     Type_Id integer,
     Status_Date timestamp,

@@ -21,3 +21,9 @@ services:
       ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
     dependsOn:
       - debezium
+  ksqlomcd:
+    path: src/services/ksqlomcd
+    params:
+      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+    dependsOn:
+      - debezium
