@@ -354,6 +354,7 @@ CREATE STREAM IF NOT EXISTS K_seatool_State_Plan_stream (
     Alert_Milestone4_Days integer,
     End_Date timestamp,
     Remarks_Memo varchar,
+    Changed_Date timestamp,
     Status_Memo varchar,
     Summary_Memo varchar,
     Priority_Comments_Memo varchar,
