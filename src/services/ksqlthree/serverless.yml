@@ -1,4 +1,4 @@
-service: ${self:custom.project}-ksqlomcd
+service: ${self:custom.project}-ksqlthree
 
 frameworkVersion: "3"
 
@@ -346,8 +346,8 @@ resources:
         ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
         TopicPatternsToDelete:
-          - ${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg*
-          - ${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg*
+          - ${param:topicNamespace}aws.seatool.ksql.onemac.three.agg*
+          - ${param:topicNamespace}aws.seatool.ksql.onemac.three.tld*
           - _confluent-ksql-${param:topicNamespace}${self:service}-*
           - ${param:topicNamespace}${self:service}*
       DependsOn:

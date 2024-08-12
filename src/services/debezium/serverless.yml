@@ -152,6 +152,56 @@ resources:
             - ${param:topicNamespace}
             - ""
   Resources:
+    CreateTopicsV3:
+      Type: AWS::CloudFormation::CustomResource
+      Properties:
+        ServiceToken: !GetAtt CreateTopicsLambdaFunction.Arn
+        BrokerString: ${self:custom.brokerString}
+        TopicsToCreate:
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.dbHistory
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Action_Officers
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Action_Types
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.aspnet_Users
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Call_Held_Reasons
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Code_After_Init_Assess
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Column_Definition
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Components_StatePlans
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Components
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Early_Alert_Field_Types
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Early_Alert_Fields
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Email
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.EmailDistribution
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Holiday
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.OCD_Review
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Officers
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Plan_Types
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Position
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Priority_Codes
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Priority_Complexity
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Priority_Review_Position
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.RAI
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Region_Access
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Region
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.SPA_Type
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.SPW_Status
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_1115_State_PN
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_1115_TE
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_1115
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_APD_Sub_Type
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_APD
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_Early_Alerts
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_Impact_Funding
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.States_Officer_Represents
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.States
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Stop_Resume_Dates
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Sub_Type
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Table_Definition
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Title_Type
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Type
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_Service_Types
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_Service_SubTypes
     CreateTopicsV2:
       Type: AWS::CloudFormation::CustomResource
       Properties:
@@ -262,6 +312,7 @@ resources:
         ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
         TopicPatternsToDelete:
+          - ${param:topicNamespace}aws.seatool.cdc.debezium*
           - ${param:topicNamespace}aws.seatool.debezium.cdc*
           - ${param:topicNamespace}aws.seatool.debezium.changed_date*
           - ${param:topicNamespace}mgmt.connect.${self:service}*
