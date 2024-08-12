@@ -19,3 +19,5 @@ services:
     path: src/services/ksqlthree
     params:
       ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
+    dependsOn:
+      - debezium
