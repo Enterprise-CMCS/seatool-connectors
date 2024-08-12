@@ -1,7 +1,7 @@
 SET 'auto.offset.reset' = 'earliest';
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_ActionTypes
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_ActionTypes',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_ActionTypes',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number,
         payload->after->Action_Type,
         STRUCT (
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_ActionTypes
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Action_Types
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.Action_Types',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Action_Types',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(atp.ActionType) as ActionTypes
    FROM K_seatool_tld_SP_ActionTypes sp
@@ -23,7 +23,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_CallHeldReasons
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_CallHeldReasons',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_CallHeldReasons',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number,
         payload->after->Call_Held_Reason_ID,
         STRUCT (
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_CallHeldReasons
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_CallHeldReasons
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.CallHeldReasons',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.CallHeldReasons',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(chr.CallHeldReason) as CallHeldReasons
    FROM K_seatool_tld_SP_CallHeldReasons sp
@@ -45,7 +45,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_Code_After_Init_Assess
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_Code_After_Init_Assess',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_Code_After_Init_Assess',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number,
         payload->after->Code_after_init_assess_ID,
         STRUCT (
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_Code_After_Init_Assess
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Code_After_Init_Assess
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.Code_after_init_assess',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Code_after_init_assess',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(ca.InitAssess) as CodeAfterInitAccess
    FROM K_seatool_tld_SP_Code_After_Init_Assess sp
@@ -67,7 +67,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_Components
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_Components',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_Components',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number,
         payload->after->Component_ID,
         STRUCT (
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_Components
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Components
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.Components',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Components',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(c.Component) as Components
    FROM K_seatool_tld_SP_Components sp
@@ -89,7 +89,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_OCD_Review
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_OCD_Review',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_OCD_Review',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number,
         payload->after->OCD_Review_ID,
         STRUCT (
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_OCD_Review
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_OCD_Review
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.OCD_Review',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.OCD_Review',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(orv.OCDReview) as OCDReview
    FROM K_seatool_tld_SP_OCD_Review sp
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_agg_OCD_Review
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_Officers
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number ,
         ifnull(payload->after->RO_Analyst_ID, -1) RO_Analyst_ID,
         ifnull(payload->after->Backup_Program_Analyst_ID, -1) Backup_Program_Analyst_ID,
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_Officers
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_RO_Analyst_Officers
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.RAnalyst_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.RAnalyst_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(o.Officer) as RO_Analyst_Officers
    FROM K_seatool_tld_SP_Officers sp
@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_agg_RO_Analyst_Officers
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Program_Analyst_Officers
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.ProgramAnalyst_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.ProgramAnalyst_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(o.Officer) as Program_Analyst_Officers
    FROM K_seatool_tld_SP_Officers sp
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_agg_Program_Analyst_Officers
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_FM_Analyst_Officers
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.FM_Analyst_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.FM_Analyst_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(o.Officer) as FM_Analyst_Officers
    FROM K_seatool_tld_SP_Officers sp
@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_agg_FM_Analyst_Officers
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Lead_Analyst_Officers
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.Lead_Analyst_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Lead_Analyst_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(o.Officer) as Lead_Analyst_Officers
    FROM K_seatool_tld_SP_Officers sp
@@ -169,7 +169,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_PriorityCodes
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_PriorityCodes',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_PriorityCodes',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number,
         payload->after->Priority_Code_ID,
         STRUCT (
@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_PriorityCodes
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Priority_Codes
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.Priority_Codes',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Priority_Codes',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(pc.PriorityCode) as PriorityCodes
    FROM K_seatool_tld_SP_PriorityCodes sp
@@ -191,7 +191,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_PriorityComplexity
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_PriorityComplexity',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_PriorityComplexity',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number,
         payload->after->Priority_Complexity_ID,
         STRUCT (
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_PriorityComplexity
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Priority_Complexity
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.Priority_Complexity',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Priority_Complexity',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(pc.PriorityComplexity) as PriorityComplexity
    FROM K_seatool_tld_SP_PriorityComplexity sp
@@ -213,7 +213,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_PriorityReviewPosition
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_PriorityReviewPosition',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_PriorityReviewPosition',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number,
         payload->after->Review_Position_ID,
         STRUCT (
@@ -225,7 +225,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_PriorityReviewPosition
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Review_Position
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.Review_Position',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Review_Position',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(rp.PriorityReviewPosition) as ReviewPosition
    FROM K_seatool_tld_SP_PriorityReviewPosition sp
@@ -235,7 +235,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_Region
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_Region',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_Region',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number,
         payload->after->Region_ID,
         STRUCT (
@@ -247,7 +247,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_Region
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Region
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.Region',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Region',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(r.Region) as Region
    FROM K_seatool_tld_SP_Region sp
@@ -256,7 +256,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_agg_Region
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_States
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_States',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_States',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number,
         payload->after->State_Code,
         STRUCT (
@@ -268,7 +268,7 @@ CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_States
 EMIT CHANGES;
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_States
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.States',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.States',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT sp.ID_Number,
         COLLECT_LIST(S.State) as States
    FROM K_seatool_tld_SP_States sp
@@ -278,7 +278,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_tld_SP_Type
- WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.v2.agg.SP_Type',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+ WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.tld.SP_Type',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
  SELECT payload->after->ID_Number,
         payload->after->Type_ID,
         STRUCT (

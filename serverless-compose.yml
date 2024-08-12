@@ -15,14 +15,8 @@ services:
     path: src/services/debezium
     params:
       ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
-  ksqlom:
-    path: src/services/ksqlom
-    params:
-      ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
-    dependsOn:
-      - debezium
-  ksqlomcd:
-    path: src/services/ksqlomcd
+  ksqlthree:
+    path: src/services/ksqlthree
     params:
       ecsFailureTopicArn: ${alerts.ECSFailureTopicArn}
     dependsOn:
