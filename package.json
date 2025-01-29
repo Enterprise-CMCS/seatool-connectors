@@ -39,7 +39,7 @@
     "aws-sdk-client-mock": "^2.0.1",
     "prettier": "2.7.1",
     "semantic-release": "^19.0.5",
-    "serverless": "^3.17.0",
+    "serverless": "3.17.0",
     "serverless-bundle": "^6.0.0",
     "serverless-disable-functions": "^1.0.0",
     "serverless-plugin-scripts": "^1.0.2",
@@ -47,7 +47,6 @@
     "serverless-stack-termination-protection": "^2.0.2",
     "vitest": "^0.29.8"
   },
-  "dependencies": {},
   "release": {
     "branches": [
       "production"
