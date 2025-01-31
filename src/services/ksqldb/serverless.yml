@@ -80,9 +80,9 @@ params:
     topicNamespace: ""
   production:
     cpu: 2048
-    heap: "-Xms7G -Xmx7G" # Was -Xms15G -Xmx15G
+    heap: "-Xms15G -Xmx15G"
     memory: 10240
-    rocksdbCache: 1073741824 # Was 10737418240
+    rocksdbCache: 10737418240
     topicNamespace: ""
   default:
     cpu: 2048
