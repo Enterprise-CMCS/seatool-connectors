@@ -1,7 +1,7 @@
 SET 'auto.offset.reset' = 'earliest';
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Action_Officers
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.Action_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Action_Officers',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT ao.pk->payload->ID_Number, 
          COLLECT_LIST(o.Officer) as ActionOfficers
     FROM K_seatool_tld_Action_Officers ao
@@ -11,7 +11,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Components_StatePlans
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.Components_StatePlans',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Components_StatePlans',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT sp.pk->payload->ID_Number,
          COLLECT_LIST(c.Component) as ComponentsStatePlans
     FROM  K_seatool_tld_Components_StatePlans sp
@@ -21,7 +21,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_State_Plan_1115
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.State_Plan_1115',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.State_Plan_1115',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT sp.ID_Number,
          STRUCT(
            StatePlan1115 := COLLECT_LIST(sp.STATEPLAN1115),
@@ -34,7 +34,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_State_Plan_APD_Sub_Type
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.State_Plan_APD_Sub_Type',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.State_Plan_APD_Sub_Type',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT sp.pk->payload->ID_Number,
          COLLECT_LIST(st.SubType) as SubType
     FROM  K_seatool_tld_State_Plan_APD_Sub_Type sp
@@ -44,7 +44,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_State_Plan_Early_Alerts
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.State_Plan_Early_Alerts',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.State_Plan_Early_Alerts',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT sp.pk->payload->ID_Number,
          STRUCT(
            EarlyAlert := COLLECT_LIST(sp.STATEPLANEARLYALERT),
@@ -57,7 +57,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_RAI
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.RAI',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.RAI',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT r.pk->payload->ID_Number,
          COLLECT_LIST(r.RAI) as RAI
     FROM  K_seatool_tld_RAI r
@@ -66,7 +66,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_State_Plan_APD
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.State_Plan_APD',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.State_Plan_APD',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT sp.ID_Number,
          COLLECT_LIST(sp.StatePlanAPD) as StatePlanAPD
     FROM  K_seatool_tld_State_Plan_APD sp
@@ -75,7 +75,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_State_Plan_Impact_Funding
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.State_Plan_Impact_Funding',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.State_Plan_Impact_Funding',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT sp.ID_Number,
          COLLECT_LIST(sp.ImpactFunding) as StatePlanImpactFunding
     FROM  K_seatool_tld_State_Plan_Impact_Funding sp
@@ -84,7 +84,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Stop_Resume_Dates
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.Stop_Resume_Dates',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Stop_Resume_Dates',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT sr.pk->payload->ID_Number,
          COLLECT_LIST(sr.StopResumeDate) as StopResumeDates
     FROM  K_seatool_tld_Stop_Resume_Dates sr
@@ -93,7 +93,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_Service_Types
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.Service_Types',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.Service_Types',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT ao.pk->payload->ID_Number, 
          COLLECT_LIST(o.SPAType) as StatePlanServiceType
     FROM K_seatool_tld_State_Plan_Service_Types ao
@@ -103,7 +103,7 @@ EMIT CHANGES;
 
 
 CREATE TABLE IF NOT EXISTS K_seatool_agg_State_Plan_Service_SubTypes
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.State_Plan_Service_SubTypes',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.State_Plan_Service_SubTypes',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
   SELECT ao.pk->payload->ID_Number,
          COLLECT_LIST(o.Type) as StatePlanServiceSubTypes
     FROM  K_seatool_tld_State_Plan_Service_SubTypes ao
