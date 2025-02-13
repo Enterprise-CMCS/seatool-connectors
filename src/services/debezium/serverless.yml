@@ -91,8 +91,12 @@ params:
   val:
     topicNamespace: ""
   production:
+    cpu: 8192
+    memory: 4096
     topicNamespace: ""
   default:
+    cpu: 256
+    memory: 2048
     topicNamespace: --${self:custom.project}--${sls:stage}--
 
 functions:
@@ -502,8 +506,8 @@ resources:
         TaskRoleArn: !GetAtt KafkaConnectWorkerRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: 8GB
-        Cpu: 4096
+        Memory: ${param:memory}
+        Cpu: ${param:cpu}
         Tags:
           - Key: ConditionalDependencyHack
             Value:
