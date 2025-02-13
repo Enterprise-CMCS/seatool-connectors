@@ -94,7 +94,7 @@ params:
     topicNamespace: ""
   default:
     cpu: 256
-    memory: 11264
+    memory: 2048
     topicNamespace: --${self:custom.project}--${sls:stage}--
 
 functions:
@@ -299,8 +299,8 @@ resources:
         ContainerDefinitions:
           - Name: connect
             Image: ${self:custom.connectImage}
-            Memory: 4096
-            Cpu: 2048
+            Memory: 1024
+            Cpu: 128
             portMappings:
               - containerPort: 8083
                 hostPort: 8083
@@ -367,7 +367,7 @@ resources:
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
           - Name: mssql-tools
             Image: "mcr.microsoft.com/mssql-tools"
-            Memory: 2048
+            Memory: 128
             Command:
               - bash
               - "-c"
@@ -375,8 +375,8 @@ resources:
                 sleep infinity
           - Name: connect-ui
             Image: ${self:custom.connectUiImage}
-            Memory: 4096
-            Cpu: 2048
+            Memory: 1024
+            Cpu: 128
             DependsOn:
               - ContainerName: connect
                 Condition: START
