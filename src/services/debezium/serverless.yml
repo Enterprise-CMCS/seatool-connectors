@@ -91,10 +91,10 @@ params:
   val:
     topicNamespace: ""
   production:
-    cpu: 4096
-    maxContainerCpu: 2048
-    memory: 8192
-    maxContainerMemory: 4096
+    cpu: 256
+    maxContainerCpu: 128
+    memory: 2048
+    maxContainerMemory: 1024
     topicNamespace: ""
   default:
     cpu: 256
