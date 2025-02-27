@@ -47,12 +47,15 @@ jobs:
           BRANCHES_TO_GENERATE: master
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./docs
+          destination: _site
    
 
   # Deployment job
   deploy:
     environment:
-      name: github-pages
+      name: ${{ github.ref_name }}
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
