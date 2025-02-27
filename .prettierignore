@@ -1,5 +1,6 @@
 *.md
 .idea/
+.github/
 .infra
 node_modules
 testcafe_results
