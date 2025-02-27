@@ -35,3 +35,4 @@ jobs:
           bedrock_light_model: anthropic.claude-3-5-sonnet-20240620-v1:0
           bedrock_heavy_model: anthropic.claude-3-5-sonnet-20240620-v1:0
           review_comment_lgtm: true
+          
