@@ -34,27 +34,11 @@ jobs:
         uses: actions/configure-pages@v2
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.5.1
-      - name: Install Packages
-        run: |
-          cd docs/_deploy-metrics
-          rm -rf node_modules
-          yarn install --frozen-lockfile
-          echo $BRANCHES_TO_GENERATE
-      - name: Build Dora
-        run: |
-          cd docs/_deploy-metrics
-          yarn build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-          REPO_NAME: macpro-base-template
-          BRANCHES_TO_GENERATE: master
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
           source: ./docs
           destination: _site
-   
 
   # Deployment job
   deploy:
