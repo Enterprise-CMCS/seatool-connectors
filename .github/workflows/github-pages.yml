@@ -27,16 +27,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Pages
-        uses: actions/configure-pages@v2
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3.5.1
-      - name: Build with Jekyll
+        uses: actions/configure-pages@v5
+      - name: Build
         uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./docs
-          destination: _site
-
-  # Deployment job
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
   deploy:
     environment:
       name: github-pages
