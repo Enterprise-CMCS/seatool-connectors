@@ -4,7 +4,7 @@ name: GitHub Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["master"]
+    branches: ["main"] # gh-enterprise does not support actions/deploy-pages@v4 at this time so this is a temp patch
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4 # v4 is not supported yet for gh-enterprise
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
