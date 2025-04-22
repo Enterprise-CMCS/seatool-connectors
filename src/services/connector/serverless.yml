@@ -93,6 +93,10 @@ params:
   production:
     topicNamespace: ""
   default:
+    cpu: 256
+    maxContainerCpu: 128
+    memory: 2048
+    maxContainerMemory: 1024
     topicNamespace: --${self:custom.project}--${sls:stage}--
 
 functions:
@@ -297,8 +301,8 @@ resources:
         ContainerDefinitions:
           - Name: connect
             Image: ${self:custom.connectImage}
-            Memory: 4096
-            Cpu: 2048
+            Memory: ${param:maxContainerMemory}
+            Cpu: ${param:maxContainerCpu}
             portMappings:
               - containerPort: 8083
                 hostPort: 8083
@@ -365,7 +369,7 @@ resources:
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
           - Name: mssql-tools
             Image: "mcr.microsoft.com/mssql-tools"
-            Memory: 2048
+            Memory: ${param:maxContainerMemory}
             Command:
               - bash
               - "-c"
@@ -373,8 +377,8 @@ resources:
                 sleep infinity
           - Name: connect-ui
             Image: ${self:custom.connectUiImage}
-            Memory: 4096
-            Cpu: 2048
+            Memory: ${param:maxContainerMemory}
+            Cpu: ${param:maxContainerCpu}
             DependsOn:
               - ContainerName: connect
                 Condition: START
@@ -398,8 +402,8 @@ resources:
         TaskRoleArn: !GetAtt KafkaConnectWorkerRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: 8GB
-        Cpu: 4096
+        Memory: ${param:memory}
+        Cpu: ${param:cpu}
         Tags:
           - Key: ConditionalDependencyHack
             Value:

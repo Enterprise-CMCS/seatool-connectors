@@ -91,8 +91,16 @@ params:
   val:
     topicNamespace: ""
   production:
+    cpu: 256
+    maxContainerCpu: 128
+    memory: 2048
+    maxContainerMemory: 1024
     topicNamespace: ""
   default:
+    cpu: 256
+    maxContainerCpu: 128
+    memory: 2048
+    maxContainerMemory: 1024
     topicNamespace: --${self:custom.project}--${sls:stage}--
 
 functions:
@@ -152,6 +160,106 @@ resources:
             - ${param:topicNamespace}
             - ""
   Resources:
+    CreateTopicsV3:
+      Type: AWS::CloudFormation::CustomResource
+      Properties:
+        ServiceToken: !GetAtt CreateTopicsLambdaFunction.Arn
+        BrokerString: ${self:custom.brokerString}
+        TopicsToCreate:
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.dbHistory
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Action_Officers
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Action_Types
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.aspnet_Users
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Call_Held_Reasons
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Code_After_Init_Assess
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Column_Definition
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Components_StatePlans
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Components
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Early_Alert_Field_Types
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Early_Alert_Fields
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Email
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.EmailDistribution
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Holiday
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.OCD_Review
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Officers
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Plan_Types
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Position
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Priority_Codes
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Priority_Complexity
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Priority_Review_Position
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.RAI
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Region_Access
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Region
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.SPA_Type
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.SPW_Status
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_1115_State_PN
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_1115_TE
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_1115
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_APD_Sub_Type
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_APD
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_Early_Alerts
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_Impact_Funding
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.States_Officer_Represents
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.States
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Stop_Resume_Dates
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Sub_Type
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Table_Definition
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Title_Type
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.Type
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_Service_Types
+          - name: ${param:topicNamespace}aws.seatool.cdc.debezium.SEA.dbo.State_Plan_Service_SubTypes
+    CreateTopicsV2:
+      Type: AWS::CloudFormation::CustomResource
+      Properties:
+        ServiceToken: !GetAtt CreateTopicsLambdaFunction.Arn
+        BrokerString: ${self:custom.brokerString}
+        TopicsToCreate:
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.dbHistory
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Action_Officers
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Action_Types
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.aspnet_Users
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Call_Held_Reasons
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Code_After_Init_Assess
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Column_Definition
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Components_StatePlans
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Components
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Early_Alert_Field_Types
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Early_Alert_Fields
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Email
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.EmailDistribution
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Holiday
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.OCD_Review
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Officers
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Plan_Types
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Position
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Priority_Codes
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Priority_Complexity
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Priority_Review_Position
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.RAI
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Region_Access
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Region
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.SPA_Type
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.SPW_Status
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.State_Plan_1115_State_PN
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.State_Plan_1115_TE
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.State_Plan_1115
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.State_Plan_APD_Sub_Type
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.State_Plan_APD
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.State_Plan_Early_Alerts
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.State_Plan_Impact_Funding
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.State_Plan
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.States_Officer_Represents
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.States
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Stop_Resume_Dates
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Sub_Type
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Table_Definition
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Title_Type
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.Type
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.State_Plan_Service_Types
+          - name: ${param:topicNamespace}aws.seatool.debezium.cdc.v2.SEA.dbo.State_Plan_Service_SubTypes
     CreateTopics:
       Type: AWS::CloudFormation::CustomResource
       Properties:
@@ -212,6 +320,7 @@ resources:
         ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
         TopicPatternsToDelete:
+          - ${param:topicNamespace}aws.seatool.cdc.debezium*
           - ${param:topicNamespace}aws.seatool.debezium.cdc*
           - ${param:topicNamespace}aws.seatool.debezium.changed_date*
           - ${param:topicNamespace}mgmt.connect.${self:service}*
@@ -300,8 +409,8 @@ resources:
         ContainerDefinitions:
           - Name: connect
             Image: ${self:custom.connectImage}
-            Memory: 4096
-            Cpu: 2048
+            Memory: ${param:maxContainerMemory}
+            Cpu: ${param:maxContainerCpu}
             portMappings:
               - containerPort: 8083
                 hostPort: 8083
@@ -368,7 +477,7 @@ resources:
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
           - Name: mssql-tools
             Image: "mcr.microsoft.com/mssql-tools"
-            Memory: 2048
+            Memory: ${param:maxContainerMemory}
             Command:
               - bash
               - "-c"
@@ -376,8 +485,8 @@ resources:
                 sleep infinity
           - Name: connect-ui
             Image: ${self:custom.connectUiImage}
-            Memory: 4096
-            Cpu: 2048
+            Memory: ${param:maxContainerMemory}
+            Cpu: ${param:maxContainerCpu}
             DependsOn:
               - ContainerName: connect
                 Condition: START
@@ -401,8 +510,8 @@ resources:
         TaskRoleArn: !GetAtt KafkaConnectWorkerRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: 8GB
-        Cpu: 4096
+        Memory: ${param:memory}
+        Cpu: ${param:cpu}
         Tags:
           - Key: ConditionalDependencyHack
             Value:

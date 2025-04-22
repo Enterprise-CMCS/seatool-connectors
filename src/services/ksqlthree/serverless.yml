@@ -1,4 +1,4 @@
-service: ${self:custom.project}-ksqlom
+service: ${self:custom.project}-ksqlthree
 
 frameworkVersion: "3"
 
@@ -62,15 +62,15 @@ custom:
 
 params:
   master:
-    cpu: 8192
+    cpu: 2048
     heap: "-Xms15G -Xmx15G"
-    memory: 32768
+    memory: 11264
     rocksdbCache: 11453246122
     topicNamespace: ""
   val:
-    cpu: 8192
+    cpu: 2048
     heap: "-Xms15G -Xmx15G"
-    memory: 32768
+    memory: 11264
     rocksdbCache: 11453246122
     topicNamespace: ""
   production:
@@ -346,8 +346,8 @@ resources:
         ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
         BrokerString: ${self:custom.brokerString}
         TopicPatternsToDelete:
-          - ${param:topicNamespace}aws.seatool.ksql.onemac.agg*
-          - ${param:topicNamespace}aws.seatool.ksql.onemac.tld*
+          - ${param:topicNamespace}aws.seatool.ksql.onemac.three.agg*
+          - ${param:topicNamespace}aws.seatool.ksql.onemac.three.tld*
           - _confluent-ksql-${param:topicNamespace}${self:service}-*
           - ${param:topicNamespace}${self:service}*
       DependsOn:

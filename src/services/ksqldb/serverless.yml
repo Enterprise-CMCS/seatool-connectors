@@ -72,9 +72,9 @@ params:
   val:
     topicNamespace: ""
   production:
-    cpu: 4096
+    cpu: 2048
     heap: "-Xms15G -Xmx15G"
-    memory: 30720
+    memory: 10240
     rocksdbCache: 10737418240
     topicNamespace: ""
   default:

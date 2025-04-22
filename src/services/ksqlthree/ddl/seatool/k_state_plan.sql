@@ -1,7 +1,7 @@
 SET 'auto.offset.reset' = 'earliest';
 
 CREATE TABLE IF NOT EXISTS K_SEATool_agg_State_Plan
-  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.agg.State_Plan',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
+  WITH (KAFKA_TOPIC='${param:topicNamespace}aws.seatool.ksql.onemac.three.agg.State_Plan',KEY_FORMAT='JSON',WRAP_SINGLE_VALUE=FALSE) AS
     SELECT sp.ID_Number as ID_Number,
       STRUCT(
         State_Plan := sp.StatePlan,
