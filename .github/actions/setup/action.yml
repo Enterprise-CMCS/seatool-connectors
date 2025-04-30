@@ -11,8 +11,15 @@ runs:
       with:
         node-version-file: .nvmrc
 
-    - name: Node cache
+    - name: Cache dependencies
       uses: actions/cache@v3
       with:
-        path: "**/node_modules"
-        key: ${{ github.workflow}}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock', '.nvmrc') }}
+        path: ~/.cache/pre-commit
+        key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pre-commit-
+
+    - name: Run pre-commit
+      uses: pre-commit/action@v2.0.2
+      with:
+        extra_args: --all-files
