@@ -1,49 +1,56 @@
 import { send, SUCCESS, FAILED } from "cfn-response-async";
 import * as topics from "../../../libs/topics-lib.js";
+import { 
+  executeWithRetry, 
+  logEvent, 
+  logError,
+  DEFAULT_RETRY_CONFIG 
+} from "../../../shared/utils/index.js";
 
+/**
+ * Handler for cleanup operations related to Kafka topics
+ */
 export const handler = async function (event, context) {
-  console.log("Request:", JSON.stringify(event, undefined, 2));
+  logEvent("info", "CleanupKafka request received", { 
+    requestType: event.RequestType,
+    resourceType: event.ResourceType
+  });
+  
   const responseData = {};
   let responseStatus = SUCCESS;
+  
   try {
     if (event.RequestType === "Create" || event.RequestType === "Update") {
-      console.log("This resource does nothing on Create and Update events.");
+      logEvent("info", "Create/Update request - no action needed");
     } else if (event.RequestType === "Delete") {
       const BrokerString = event.ResourceProperties.BrokerString;
-      const TopicPatternsToDelete =
-        event.ResourceProperties.TopicPatternsToDelete;
-      console.log(
-        `Attempting a delete for each of the following patterns:  ${TopicPatternsToDelete}`
-      );
+      const TopicPatternsToDelete = event.ResourceProperties.TopicPatternsToDelete;
+      
+      logEvent("info", "Attempting to delete topics", { 
+        patterns: TopicPatternsToDelete 
+      });
 
-      const maxRetries = 10;
-      const retryDelay = 10000; //10s
-      let retries = 0;
-      let success = false;
-      while (!success && retries < maxRetries) {
-        try {
+      await executeWithRetry(
+        async () => {
           await topics.deleteTopics(BrokerString, TopicPatternsToDelete);
-          success = true;
-        } catch (error) {
-          console.error(
-            `Error in deleteTopics operation: ${JSON.stringify(error)}`
-          );
-          retries++;
-          console.log(
-            `Retrying in ${
-              retryDelay / 1000
-            } seconds (Retry ${retries}/${maxRetries})`
-          );
-          await new Promise((resolve) => setTimeout(resolve, retryDelay));
+        },
+        {
+          ...DEFAULT_RETRY_CONFIG,
+          onRetry: (error, retryCount) => {
+            logEvent("warn", `Retrying delete topics operation`, { 
+              retryCount,
+              error: error.message
+            });
+          }
         }
-      }
-      if (!success) {
-        console.error(`Failed to delete topics after ${maxRetries} retries.`);
-        responseStatus = FAILED;
-      }
+      );
+      
+      logEvent("info", "Successfully deleted topics");
     }
   } catch (error) {
-    console.error(error);
+    logError(error, "cleanupKafka", {
+      requestType: event.RequestType 
+    });
     responseStatus = FAILED;
   } finally {
     await send(event, context, responseStatus, responseData, "static");

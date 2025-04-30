@@ -62,13 +62,13 @@ custom:
     hooks:
       deploy:finalize: |
         set -e
-        call=`aws lambda invoke --region ${self:provider.region} --function-name ${self:service}-${sls:stage}-configureConnectors --invocation-type RequestResponse --log Tail /dev/stdout`
+        call=aws lambda invoke --region ${self:provider.region} --function-name ${self:service}-${sls:stage}-configureConnectors --invocation-type RequestResponse --log Tail /dev/stdout
         if ! echo $call | jq '.FunctionError'; then
           echo "The Lambda function did not succeed." && exit 1;
         fi
     commands:
       connect: |
-        runningTasks=(`aws --region ${self:provider.region} ecs list-tasks --cluster ${self:service}-${sls:stage}-connect --desired-status RUNNING | jq -r ".taskArns[]"`)
+        runningTasks=(aws --region ${self:provider.region} ecs list-tasks --cluster ${self:service}-${sls:stage}-connect --desired-status RUNNING | jq -r ".taskArns[]")
         echo "\nThe following command(s) may be used to exec onto running fargate tasks.  Note, if there are no commands shown, there are no runnings tasks:"
         for task in "${runningTasks[@]}"
         do

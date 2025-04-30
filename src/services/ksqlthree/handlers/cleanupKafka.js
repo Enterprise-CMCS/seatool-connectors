@@ -1,24 +1,56 @@
 import { send, SUCCESS, FAILED } from "cfn-response-async";
 import * as topics from "../../../libs/topics-lib.js";
+import { 
+  executeWithRetry, 
+  logEvent, 
+  logError,
+  DEFAULT_RETRY_CONFIG 
+} from "../../../shared/utils/index.js";
 
+/**
+ * Handler for cleanup operations related to Kafka topics
+ */
 exports.handler = async function (event, context) {
-  console.log("Request:", JSON.stringify(event, undefined, 2));
+  logEvent("info", "CleanupKafka request received", { 
+    requestType: event.RequestType,
+    resourceType: event.ResourceType
+  });
+  
   const responseData = {};
   let responseStatus = SUCCESS;
+  
   try {
-    const BrokerString = event.ResourceProperties.BrokerString;
-    const TopicPatternsToDelete =
-      event.ResourceProperties.TopicPatternsToDelete;
-    if (event.RequestType === "Create" || event.RequestType == "Update") {
-      console.log("This resource does nothing on Create and Update events.");
+    if (event.RequestType === "Create" || event.RequestType === "Update") {
+      logEvent("info", "Create/Update request - no action needed");
     } else if (event.RequestType === "Delete") {
-      console.log(
-        `Attempting a delete for each of the following patterns:  ${TopicPatternsToDelete}`
+      const BrokerString = event.ResourceProperties.BrokerString;
+      const TopicPatternsToDelete = event.ResourceProperties.TopicPatternsToDelete;
+      
+      logEvent("info", "Attempting to delete topics", { 
+        patterns: TopicPatternsToDelete 
+      });
+
+      await executeWithRetry(
+        async () => {
+          await topics.deleteTopics(BrokerString, TopicPatternsToDelete);
+        },
+        {
+          ...DEFAULT_RETRY_CONFIG,
+          onRetry: (error, retryCount) => {
+            logEvent("warn", `Retrying delete topics operation`, { 
+              retryCount,
+              error: error.message
+            });
+          }
+        }
       );
-      await topics.deleteTopics(BrokerString, TopicPatternsToDelete);
+      
+      logEvent("info", "Successfully deleted topics");
     }
   } catch (error) {
-    console.error(error);
+    logError(error, "cleanupKafka", {
+      requestType: event.RequestType 
+    });
     responseStatus = FAILED;
   } finally {
     await send(event, context, responseStatus, responseData, "static");

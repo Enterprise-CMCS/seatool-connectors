@@ -15,7 +15,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   region: ${env:REGION_A}
   stackTags:
     PROJECT: ${self:custom.project}
@@ -24,6 +24,8 @@ provider:
     role:
       path: /delegatedadmin/developer/
       permissionsBoundary: arn:aws:iam::${aws:accountId}:policy/cms-cloud-admin/developer-boundary-policy
+      managedPolicies:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
       statements:
         - Effect: "Allow"
           Action:
@@ -31,25 +33,31 @@ provider:
           Resource:
             - !Sub "${DdlBucket.Arn}"
             - !Sub "${DdlBucket.Arn}/*"
+        - Effect: "Allow"
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource:
+            - !Sub "arn:aws:secretsmanager:${self:provider.region}:${AWS::AccountId}:secret:${self:custom.project}*"
+            - !Sub "arn:aws:secretsmanager:${self:provider.region}:${AWS::AccountId}:secret:ecr/images*"
+        - Effect: "Allow"
+          Action:
+            - ssm:GetParameter
+          Resource:
+            - !Sub "arn:aws:ssm:${self:provider.region}:${AWS::AccountId}:parameter/aws/reference/secretsmanager/${self:custom.project}*"
+            - !Sub "arn:aws:ssm:${self:provider.region}:${AWS::AccountId}:parameter/aws/reference/secretsmanager/ecr/images*"
 
 custom:
   project: ${env:PROJECT}
   serverlessTerminationProtection:
-    stages: # Apply CloudFormation termination protection for these stages
+    stages:
       - master
       - val
       - production
-  vpc: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/vpc, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/vpc}
+  vpc: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/vpc}
   ksqldbImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/ksqldb-server:0.26.0"}
-  brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
+  brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString}
   headlessSqlContents: ${file(./compileDDL.js):ddl}
   scripts:
-    hooks:
-      package:initialize: |
-        set -e
-        set -x
-        mkdir -p .ddl
-        echo "${self:custom.headlessSqlContents}" > .ddl/combined.sql
     commands:
       connect: |
         runningInteractiveTasks=(`aws --region ${self:provider.region} ecs list-tasks --cluster ${self:service}-${sls:stage}-connect --service-name ksqldb-interactive --desired-status RUNNING | jq -r ".taskArns[]"`)
@@ -66,34 +74,9 @@ custom:
           echo aws --region ${self:provider.region} ecs execute-command --cluster ${self:service}-${sls:stage}-connect --task ${task##*/} --container ksqldb-headless --interactive --command "/bin/sh"
         done
 
-params:
-  master:
-    topicNamespace: ""
-  val:
-    topicNamespace: ""
-  production:
-    cpu: 2048
-    heap: "-Xms15G -Xmx15G"
-    memory: 10240
-    rocksdbCache: 10737418240
-    topicNamespace: ""
-  default:
-    cpu: 2048
-    heap: "-Xms4G -Xmx4G"
-    memory: 8192
-    rocksdbCache: 2147483648
-    topicNamespace: --${self:custom.project}--${sls:stage}--
-
-layers:
-  ddl:
-    name: ${self:service}-${sls:stage}
-    path: ./.ddl
-
 functions:
   stageDdl:
     handler: handlers/stageDdl.handler
-    layers:
-      - !Ref DdlLambdaLayer
     timeout: 900
     maximumRetryAttempts: 0
     environment:
@@ -103,49 +86,111 @@ functions:
     vpc:
       securityGroupIds:
         - Ref: LambdaSecurityGroup
-      subnetIds: >-
-        ${self:custom.vpc.privateSubnets}
-    timeout: 300
+      subnetIds: ${self:custom.vpc.privateSubnets}
 
 resources:
-  Conditions:
-    isDev:
-      Fn::Not:
-        - Fn::Equals:
-            - ${param:topicNamespace}
-            - ""
   Resources:
+    DdlBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+
     StageDdl:
       Type: AWS::CloudFormation::CustomResource
       Properties:
         ServiceToken: !GetAtt StageDdlLambdaFunction.Arn
         DdlBucket: !Ref DdlBucket
-        TopicNamespace: ${param:topicNamespace}
-        LayerVersion: !Ref DdlLambdaLayer
+        SqlContents: ${self:custom.headlessSqlContents}
+
+    KsqlDBCluster:
+      Type: AWS::ECS::Cluster
+      Properties:
+        ClusterName: ${self:service}-${sls:stage}-cluster
+        ClusterSettings:
+          - Name: containerInsights
+            Value: enabled
+
+    KsqlDBTaskDefinition:
+      Type: AWS::ECS::TaskDefinition
+      Properties:
+        Family: ${self:service}-${sls:stage}-ksqldb
+        RequiresCompatibilities:
+          - FARGATE
+        NetworkMode: awsvpc
+        Cpu: 2048
+        Memory: 8192
+        ExecutionRoleArn: !Ref IamRoleLambdaExecution
+        TaskRoleArn: !Ref IamRoleLambdaExecution
+        ContainerDefinitions:
+          - Name: ksqldb-server
+            Image: ${self:custom.ksqldbImage}
+            Essential: true
+            PortMappings:
+              - ContainerPort: 8088
+                Protocol: tcp
+            Environment:
+              - Name: KSQL_BOOTSTRAP_SERVERS
+                Value: ${self:custom.brokerString}
+              - Name: KSQL_LISTENERS
+                Value: "http://0.0.0.0:8088"
+              - Name: KSQL_KSQL_SERVICE_ID
+                Value: ${self:service}-${sls:stage}-ksqldb
+            LogConfiguration:
+              LogDriver: awslogs
+              Options:
+                awslogs-region: ${self:provider.region}
+                awslogs-group: /ecs/${self:service}-${sls:stage}
+                awslogs-stream-prefix: ksqldb
+
+    KsqlDBService:
+      Type: AWS::ECS::Service
+      DependsOn: KsqlDBCluster
+      Properties:
+        Cluster: !Ref KsqlDBCluster
+        TaskDefinition: !Ref KsqlDBTaskDefinition
+        DesiredCount: 1
+        LaunchType: FARGATE
+        NetworkConfiguration:
+          AwsvpcConfiguration:
+            Subnets: ${self:custom.vpc.privateSubnets}
+            SecurityGroups:
+              - !Ref KsqlDBSecurityGroup
+            AssignPublicIp: DISABLED
+
+    KsqlDBSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        VpcId: ${self:custom.vpc.id}
+        GroupDescription: Allow ECS tasks to communicate internally and externally
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 8088
+            ToPort: 8088
+            CidrIp: 0.0.0.0/0
+        SecurityGroupEgress:
+          - IpProtocol: -1
+            CidrIp: 0.0.0.0/0
+
+    LambdaSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Lambda security group
+        VpcId: ${self:custom.vpc.id}
+
+    LogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /ecs/${self:service}-${sls:stage}
+        RetentionInDays: 14
+
     ksqldbHeadlessLogGroup:
       Type: "AWS::Logs::LogGroup"
       Properties:
         LogGroupName: /aws/fargate/${self:service}-${sls:stage}-ksqldb-headless
-    ksqldbSecurityGroup:
-      Type: AWS::EC2::SecurityGroup
-      DeletionPolicy: Retain
-      Properties:
-        GroupDescription: Security Group for the Fargate
-        VpcId: ${self:custom.vpc.id}
-    ksqldbSecurityGroupEgress:
-      Type: AWS::EC2::SecurityGroupEgress
-      Properties:
-        GroupId: !Ref ksqldbSecurityGroup
-        IpProtocol: -1
-        CidrIp: 0.0.0.0/0
-    ksqldbSecurityGroupIngressCluster:
-      Type: AWS::EC2::SecurityGroupIngress
-      Properties:
-        GroupId: !Ref ksqldbSecurityGroup
-        IpProtocol: tcp
-        FromPort: 8088
-        ToPort: 8088
-        SourceSecurityGroupId: !Ref ksqldbSecurityGroup
+
     ksqldbHeadlessRole:
       Type: "AWS::IAM::Role"
       Properties:
@@ -170,7 +215,6 @@ resources:
                     - s3:GetObject
                     - S3:ListBucket
                   Resource: "*"
-                  Policies:
                 - Effect: Allow
                   Action:
                     - ssmmessages:CreateControlChannel
@@ -178,10 +222,14 @@ resources:
                     - ssmmessages:OpenControlChannel
                     - ssmmessages:OpenDataChannel
                   Resource: "*"
-                - Effect: Allow
-                  Action:
-                    - ecr:BatchGetImage
-                  Resource: !Sub "arn:aws:ecr:${self:provider.region}:${AWS::AccountId}:repository/*"
+
+    ksqldbHeadlessCluster:
+      Type: "AWS::ECS::Cluster"
+      Properties:
+        ClusterName: ${self:service}-${sls:stage}-connect
+        ClusterSettings:
+          - Name: containerInsights
+            Value: enabled
 
     ksqldbHeadlessTaskDefinition:
       Type: "AWS::ECS::TaskDefinition"
@@ -209,11 +257,6 @@ resources:
                 unzip $DDL_KEY &&
                 mv combined.sql /home/appuser/headless.sql &&
                 cat /home/appuser/headless.sql &&
-                wget https://ksqldb-maven.s3-us-west-2.amazonaws.com/maven/io/confluent/ksql/ksql-rocksdb-config-setter/0.7.1/ksql-rocksdb-config-setter-0.7.1.jar -O /usr/share/java/ksqldb-rest-app/ksql-rocksdb-config-setter-0.7.1.jar &&
-                echo "ksql.streams.rocksdb.config.setter=io.confluent.ksql.rocksdb.KsqlBoundedMemoryRocksDBConfigSetter" >> /etc/ksqldb/ksqldb-server.properties &&
-                echo "ksql.plugins.rocksdb.cache.size={param:rocksdbCache}" >> /etc/ksqldb/ksqldb-server.properties &&
-                echo "ksql.plugins.rocksdb.write.buffer.cache.use=true" >> /etc/ksqldb/ksqldb-server.properties &&
-                echo "ksql.plugins.rocksdb.num.background.threads=1" >> /etc/ksqldb/ksqldb-server.properties &&
                 /usr/bin/docker/run
             Environment:
               - Name: DDL_BUCKET
@@ -243,15 +286,7 @@ resources:
               - Name: KSQL_KSQL_QUERIES_FILE
                 Value: "/home/appuser/headless.sql"
               - Name: KSQL_KSQL_SERVICE_ID
-                Value: "${param:topicNamespace}${self:service}-headless"
-              - Name: KSQL_KSQL_STREAMS_PRODUCER_DELIVERY_TIMEOUT_MS
-                Value: 2147483647
-              - Name: KSQL_KSQL_STREAMS_PRODUCER_MAX_BLOCK_MS
-                Value: 9223372036854774000
-              - Name: KSQL_CLASSPATH
-                Value: "/usr/share/java/ksqldb-rest-app/*"
-              - Name: KSQL_HEAP_OPTS
-                Value: ${param:heap}
+                Value: "${self:service}-headless"
             LogConfiguration:
               LogDriver: awslogs
               Options:
@@ -265,25 +300,11 @@ resources:
         TaskRoleArn: !GetAtt ksqldbHeadlessRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: ${param:memory}
-        Cpu: ${param:cpu}
+        Memory: 8192
+        Cpu: 2048
         EphemeralStorage:
           SizeInGiB: 200
-        Tags:
-          - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
-            Value:
-              Fn::If:
-                - isDev
-                - !Ref CleanupTopics
-                - Blank
 
-    ksqldbHeadlessCluster:
-      Type: "AWS::ECS::Cluster"
-      Properties:
-        ClusterName: ${self:service}-${sls:stage}-connect
-        ClusterSettings:
-          - Name: containerInsights
-            Value: enabled
     ksqldbHeadlessService:
       Type: "AWS::ECS::Service"
       Properties:
@@ -303,247 +324,5 @@ resources:
           AwsvpcConfiguration:
             AssignPublicIp: DISABLED
             SecurityGroups:
-              - !Ref ksqldbSecurityGroup
-            Subnets: >-
-              ${self:custom.vpc.privateSubnets}
-    ECSFailureEventRule:
-      Type: AWS::Events::Rule
-      Properties:
-        Description: "ksqlDB Cluster Task Failure Event Rule"
-        EventPattern:
-          account:
-            - !Ref AWS::AccountId
-          source:
-            - "aws.ecs"
-            - "demo.cli" # used to test events from the command line
-          detail-type:
-            - "ECS Task State Change"
-          detail:
-            lastStatus:
-              - "STOPPED"
-            stoppedReason:
-              - "Essential container in task exited"
-              - "Task failed container health checks"
-            clusterArn:
-              - !GetAtt ksqldbHeadlessCluster.Arn
-        Targets:
-          - Arn: ${param:ecsFailureTopicArn}
-            Id: "KsqlDbEcsTaskFailure"
-            InputTransformer:
-              InputPathsMap:
-                "clusterArn": "$.detail.clusterArn"
-                "status": "$.detail.lastStatus"
-                "account": "$.account"
-                "stoppedReason": "$.detail.stoppedReason"
-              InputTemplate: |
-                "A KsqlDB Cluster Task Failure Event has occured. Account: <account> Cluster ARN: <clusterArn> Status: <status> Reason: <stoppedReason>"
-
-    ksqldbIntLogGroup:
-      Type: "AWS::Logs::LogGroup"
-      Properties:
-        LogGroupName: /aws/fargate/${self:service}-${sls:stage}-ksqldbInt
-
-    ksqldbIntTaskDefinition:
-      Type: "AWS::ECS::TaskDefinition"
-      Properties:
-        ContainerDefinitions:
-          - Name: ksqldb-interactive
-            Image: ${self:custom.ksqldbImage}
-            Command:
-              - bash
-              - "-c"
-              - |
-                df -h &&
-                echo "int ksqlDB task..." &&
-                cd ~ &&
-                curl -O https://packages.confluent.io/archive/7.0/confluent-community-7.0.0.tar.gz &&
-                tar -xzvf confluent-community-7.0.0.tar.gz &&
-                ln -s confluent-community-7.0.0 confluent-community &&
-                /usr/bin/docker/run
-            Environment:
-              - Name: KSQL_LISTENERS
-                Value: "http://0.0.0.0:8088"
-              - Name: KSQL_BOOTSTRAP_SERVERS
-                Value: "${self:custom.brokerString}"
-              - Name: KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE
-                Value: "true"
-              - Name: KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE
-                Value: "true"
-              - Name: KSQL_SECURITY_PROTOCOL
-                Value: SSL
-              - Name: KSQL_KSQL_INTERNAL_TOPIC_REPLICAS
-                Value: 3
-              - Name: KSQL_KSQL_INTERNAL_TOPIC_MIN_INSYNC_REPLICAS
-                Value: 2
-              - Name: KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR
-                Value: 3
-              - Name: KSQL_KSQL_STREAMS_REPLICATION_FACTOR
-                Value: 3
-              - Name: KSQL_KSQL_STREAMS_PRODUCER_ACKS
-                Value: "all"
-              - Name: KSQL_KSQL_STREAMS_TOPIC_MIN_INSYNC_REPLICAS
-                Value: 2
-              - Name: KSQL_KSQL_SERVICE_ID
-                Value: "${param:topicNamespace}${self:service}-int"
-            LogConfiguration:
-              LogDriver: awslogs
-              Options:
-                awslogs-region: !Ref AWS::Region
-                awslogs-group: !Ref ksqldbIntLogGroup
-                awslogs-stream-prefix: fargate
-                awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
-        Family: ${self:service}-${sls:stage}-ksqldbInt
-        NetworkMode: awsvpc
-        ExecutionRoleArn: !GetAtt ksqldbHeadlessRole.Arn
-        TaskRoleArn: !GetAtt ksqldbHeadlessRole.Arn
-        RequiresCompatibilities:
-          - FARGATE
-        Memory: ${param:memory}
-        Cpu: ${param:cpu}
-        EphemeralStorage:
-          SizeInGiB: 50
-        Tags:
-          - Key: ConditionalDependencyHack # Ensures order based on a conditioanl resource
-            Value:
-              Fn::If:
-                - isDev
-                - !Ref CleanupTopics
-                - Blank
-
-    ksqldbIntService:
-      Type: "AWS::ECS::Service"
-      Properties:
-        Cluster: !Ref ksqldbHeadlessCluster
-        DeploymentConfiguration:
-          MaximumPercent: 100
-          MinimumHealthyPercent: 0
-        LaunchType: FARGATE
-        ServiceName: ksqldb-interactive
-        DesiredCount: 0
-        TaskDefinition: !Ref ksqldbIntTaskDefinition
-        EnableExecuteCommand: true
-        NetworkConfiguration:
-          AwsvpcConfiguration:
-            AssignPublicIp: DISABLED
-            SecurityGroups:
-              - !Ref ksqldbSecurityGroup
-            Subnets: >-
-              ${self:custom.vpc.privateSubnets}
-    CleanupTopics:
-      Type: AWS::CloudFormation::CustomResource
-      Condition: isDev # We only clean up topics in lower environments where isDev is true
-      Properties:
-        ServiceToken: !GetAtt CleanupKafkaLambdaFunction.Arn
-        BrokerString: ${self:custom.brokerString}
-        TopicPatternsToDelete:
-          - ${param:topicNamespace}aws.ksqldb.seatool.agg*
-          - ${param:topicNamespace}aws.ksqldb.seatool.tld*
-          - _confluent-ksql-${param:topicNamespace}${self:service}-*
-          - ${param:topicNamespace}${self:service}*
-      DependsOn:
-        - LambdaSecurityGroupEgress
-
-    ksqldbHeadlessServiceECSCpuAlarm:
-      Type: AWS::CloudWatch::Alarm
-      Properties:
-        AlarmName: ${self:service}-${sls:stage}-ksqldbHeadlessService-CPUUtilization
-        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 80%"
-        Namespace: AWS/ECS
-        MetricName: CPUUtilization
-        Dimensions:
-          - Name: ClusterName
-            Value: !Ref ksqldbHeadlessCluster
-          - Name: ServiceName
-            Value: !GetAtt ksqldbHeadlessService.Name
-        Statistic: Average
-        Period: 300
-        EvaluationPeriods: 3
-        Threshold: 80
-        ComparisonOperator: GreaterThanOrEqualToThreshold
-        AlarmActions:
-          - ${param:ecsFailureTopicArn}
-        OKActions:
-          - ${param:ecsFailureTopicArn}
-    ksqldbHeadlessServiceECSMemoryAlarm:
-      Type: AWS::CloudWatch::Alarm
-      Properties:
-        AlarmName: ${self:service}-${sls:stage}-ksqldbHeadlessService-MemoryUtilization
-        AlarmDescription: "Trigger an alarm when the Memory utilization reaches 75%"
-        Namespace: AWS/ECS
-        MetricName: MemoryUtilization
-        Dimensions:
-          - Name: ClusterName
-            Value: !Ref ksqldbHeadlessCluster
-          - Name: ServiceName
-            Value: !GetAtt ksqldbHeadlessService.Name
-        Statistic: Average
-        Period: 60
-        EvaluationPeriods: 2
-        Threshold: 75
-        ComparisonOperator: GreaterThanOrEqualToThreshold
-        AlarmActions:
-          - ${param:ecsFailureTopicArn}
-        OKActions:
-          - ${param:ecsFailureTopicArn}
-    ksqldbIntServiceECSCpuAlarm:
-      Type: AWS::CloudWatch::Alarm
-      Properties:
-        AlarmName: ${self:service}-${sls:stage}-ksqldbIntService-CPUUtilization
-        AlarmDescription: "Trigger an alarm when the CPU utilization reaches 80%"
-        Namespace: AWS/ECS
-        MetricName: CPUUtilization
-        Dimensions:
-          - Name: ClusterName
-            Value: !Ref ksqldbHeadlessCluster
-          - Name: ServiceName
-            Value: !GetAtt ksqldbIntService.Name
-        Statistic: Average
-        Period: 300
-        EvaluationPeriods: 3
-        Threshold: 80
-        ComparisonOperator: GreaterThanOrEqualToThreshold
-        AlarmActions:
-          - ${param:ecsFailureTopicArn}
-        OKActions:
-          - ${param:ecsFailureTopicArn}
-    ksqldbIntServiceECSMemoryAlarm:
-      Type: AWS::CloudWatch::Alarm
-      Properties:
-        AlarmName: ${self:service}-${sls:stage}-ksqldbIntService-MemoryUtilization
-        AlarmDescription: Trigger an alarm when the Memory utilization reaches 75%
-        Namespace: AWS/ECS
-        MetricName: MemoryUtilization
-        Dimensions:
-          - Name: ClusterName
-            Value: !Ref ksqldbHeadlessCluster
-          - Name: ServiceName
-            Value: !GetAtt ksqldbIntService.Name
-        Statistic: Average
-        Period: 60
-        EvaluationPeriods: 2
-        Threshold: 75
-        ComparisonOperator: GreaterThanOrEqualToThreshold
-        AlarmActions:
-          - ${param:ecsFailureTopicArn}
-        OKActions:
-          - ${param:ecsFailureTopicArn}
-    LambdaSecurityGroup:
-      Type: AWS::EC2::SecurityGroup
-      DeletionPolicy: Retain
-      Properties:
-        GroupDescription: Security Group for the topics lambda function
-        VpcId: ${self:custom.vpc.id}
-    LambdaSecurityGroupEgress:
-      Type: AWS::EC2::SecurityGroupEgress
-      Properties:
-        GroupId: !Ref LambdaSecurityGroup
-        IpProtocol: -1
-        CidrIp: 0.0.0.0/0
-    DdlBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: !Sub ${self:service}-${sls:stage}-ddl-${AWS::AccountId}
-        BucketEncryption:
-          ServerSideEncryptionConfiguration:
-            - ServerSideEncryptionByDefault:
-                SSEAlgorithm: AES256
+              - !Ref KsqlDBSecurityGroup
+            Subnets: ${self:custom.vpc.privateSubnets}

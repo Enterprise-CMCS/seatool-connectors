@@ -15,7 +15,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   region: ${env:REGION_A}
   stackTags:
     PROJECT: ${self:custom.project}
@@ -44,12 +44,6 @@ custom:
   brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
   headlessSqlContents: ${file(./compileDDL.js):ddl}
   scripts:
-    hooks:
-      package:initialize: |
-        set -e
-        set -x
-        mkdir -p .ddl
-        echo "${self:custom.headlessSqlContents}" > .ddl/combined.sql
     commands:
       connect: |
         runningHeadlessTasks=(`aws --region ${self:provider.region} ecs list-tasks --cluster ${self:service}-${sls:stage}-connect --service-name ksqldb-headless --desired-status RUNNING | jq -r ".taskArns[]"`)
@@ -86,16 +80,9 @@ params:
     rocksdbCache: 2147483648
     topicNamespace: --${self:custom.project}--${sls:stage}--
 
-layers:
-  ddl:
-    name: ${self:service}-${sls:stage}
-    path: ./.ddl
-
 functions:
   stageDdl:
     handler: handlers/stageDdl.handler
-    layers:
-      - !Ref DdlLambdaLayer
     timeout: 900
     maximumRetryAttempts: 0
     environment:
@@ -122,8 +109,7 @@ resources:
       Properties:
         ServiceToken: !GetAtt StageDdlLambdaFunction.Arn
         DdlBucket: !Ref DdlBucket
-        TopicNamespace: ${param:topicNamespace}
-        LayerVersion: !Ref DdlLambdaLayer
+        SqlContents: ${self:custom.headlessSqlContents}
     ksqldbHeadlessLogGroup:
       Type: "AWS::Logs::LogGroup"
       Properties:
@@ -171,7 +157,6 @@ resources:
                     - s3:GetObject
                     - S3:ListBucket
                   Resource: "*"
-                  Policies:
                 - Effect: Allow
                   Action:
                     - ssmmessages:CreateControlChannel
