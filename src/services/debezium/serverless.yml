@@ -409,8 +409,8 @@ resources:
         ContainerDefinitions:
           - Name: connect
             Image: ${self:custom.connectImage}
-            Memory: ${param:maxContainerMemory}
-            Cpu: ${param:maxContainerCpu}
+            Memory: 4096
+            Cpu: 2048
             portMappings:
               - containerPort: 8083
                 hostPort: 8083
@@ -477,7 +477,7 @@ resources:
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
           - Name: mssql-tools
             Image: "mcr.microsoft.com/mssql-tools"
-            Memory: ${param:maxContainerMemory}
+            Memory: 2048
             Command:
               - bash
               - "-c"
@@ -485,8 +485,8 @@ resources:
                 sleep infinity
           - Name: connect-ui
             Image: ${self:custom.connectUiImage}
-            Memory: ${param:maxContainerMemory}
-            Cpu: ${param:maxContainerCpu}
+            Memory: 4096
+            Cpu: 2048
             DependsOn:
               - ContainerName: connect
                 Condition: START
@@ -510,8 +510,8 @@ resources:
         TaskRoleArn: !GetAtt KafkaConnectWorkerRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: ${param:memory}
-        Cpu: ${param:cpu}
+        Memory: 8GB
+        Cpu: 4096
         Tags:
           - Key: ConditionalDependencyHack
             Value:
