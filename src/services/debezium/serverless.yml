@@ -460,8 +460,8 @@ resources:
         TaskRoleArn: !GetAtt KafkaConnectWorkerRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: ${param:memory}
-        Cpu: ${param:cpu}
+        Memory: 8GB
+        Cpu: 4096
         Tags:
           - Key: ConditionalDependencyHack
             Value:
