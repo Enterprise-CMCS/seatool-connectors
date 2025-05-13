@@ -6,26 +6,26 @@ labels: enhancement
 assignees: ""
 ---
 
-## Type of Issue:
+## Type of Issue
 
 - [x] Enhancement: New feature or request
 
-#### Issue Creator Checklist
+### Issue Creator Checklist
 
 - [ ] This issue has been thoroughly documented below; a developer should be able to understand the issue by reading it.
 
 ## Background
 
-_History or background behind this enhancement request._
+History or background behind this enhancement request.
 
 ## Proposed Approach
 
-_If applicable... sometimes we don't have a proposed approach yet, and that's OK_
+If applicable... sometimes we don't have a proposed approach yet, and that's OK.
 
 ## Value
 
-_In a sentence, or maybe two, what value does this enhancement represent?_
+In a sentence, or maybe two, what value does this enhancement represent?
 
-## AC:
+## AC
 
-_List the acceptance criteria for this issue._
+List the acceptance criteria for this issue.

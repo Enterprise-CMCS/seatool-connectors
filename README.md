@@ -1,29 +1,17 @@
-<h1 align="center" style="border-bottom: none;">seatool-connectors</h1>
-<h3 align="center">Service for comparing legacy/seatool data and sending notifications.</h3>
-<p align="center">
-  <a href="https://Enterprise-CMCS.github.io/seatool-connectors/">
-    <img alt="Docs" src="https://img.shields.io/badge/Docs-Pages-blue.svg">
-  </a>
-  <a href="https://cmsgov.slack.com/archives/C047RBDL396">
-    <img alt="Slack" src="https://img.shields.io/badge/Slack-seatool--connectors-purple.svg">
-  </a>
-  <a href="https://codeclimate.com/github/Enterprise-CMCS/seatool-connectors/maintainability">
-    <img src="https://api.codeclimate.com/v1/badges/d23421cdd24aea696605/maintainability" />
-  </a>
-  <a href="https://snyk.io/">
-    <img alt="Snyk" src="https://img.shields.io/badge/Snyk-protected-purple">
-  </a>
-  <a href="https://github.com/prettier/prettier">
-    <img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square">
-  </a>
-  <a href="https://github.com/semantic-release/semantic-release">
-    <img alt="semantic-release: angular" src="https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release">
-  </a>
-</p>
+# seatool-connectors
+
+## Service for comparing legacy/seatool data and sending notifications
+
+[![Docs](https://img.shields.io/badge/Docs-Pages-blue.svg)](https://Enterprise-CMCS.github.io/seatool-connectors/)
+[![Slack](https://img.shields.io/badge/Slack-seatool--connectors-purple.svg)](https://cmsgov.slack.com/archives/C047RBDL396)
+[![Maintainability](https://api.codeclimate.com/v1/badges/d23421cdd24aea696605/maintainability)](https://codeclimate.com/github/Enterprise-CMCS/seatool-connectors/maintainability)
+[![Snyk](https://img.shields.io/badge/Snyk-protected-purple)](https://snyk.io/)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 
 ---
 
-### Please visit our [seatool-connectors docs site](https://Enterprise-CMCS.github.io/seatool-connectors/) for complete documentation.
+### Please visit our [seatool-connectors docs site](https://Enterprise-CMCS.github.io/seatool-connectors/) for complete documentation
 
 ---
 

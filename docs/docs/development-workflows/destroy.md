@@ -5,7 +5,7 @@ parent: Development Workflows
 nav_order: 3
 ---
 
-# Deploy a Stage
+## Deploy a Stage
 
 {: .no_toc }
 
@@ -23,7 +23,7 @@ How-to deploy a new or existing stage to AWS.
 
 ### Destroy using GitHub Actions - branch deletion
 
-#### Summary
+#### Branch Deletion Summary
 
 GitHub Actions is usually the best way to destroy a stage. A Destroy workflow exists for this project, which will neatly take down any and all infrastructure related to a branch/stage, as well as deactivate the GitHub Environment, if it exists.
 
@@ -37,10 +37,12 @@ In most cases, stages are deployed from a branch in the git repo. If this is the
 
 - Stop and think about what you are doing. Destroying is a lot easier to avoid then to undo.
 - Delete the branch for the stage you wish to delete.
+
   ```bash
     cd seatool-connectors
     git push --delete origin foo
   ```
+  
 - Monitor the status of your stage's destruction in the repo's [Actions area](https://github.com/Enterprise-CMCS/seatool-connectors/actions).
 
 #### Notes
@@ -49,15 +51,11 @@ In most cases, stages are deployed from a branch in the git repo. If this is the
 
 ### Destroy using GitHub Actions - manual dispatch
 
-#### Summary
+#### Manual Dispatch Summary
 
 The same GitHub Actions workflow referenced above can be triggered manually. This is primarily useful if there is AWS infrastructure that still exists for a branch that has been deleted, and you don't want to go to the trouble of running destroy from your Mac. Or, if you want to do a clean deploy of a stage, but you don't want to delete the branch, this can also be handy.
 
-#### Prerequisites
-
 - Git repo write access; complete the Git access request portion of [onboarding]({{ site.baseurl }}{% link docs/onboarding/onboarding.md %})
-
-#### Procedure
 
 - In a browser, go to the [repo](https://github.com/Enterprise-CMCS/seatool-connectors)
 - Click the Actions tab
@@ -68,32 +66,22 @@ The same GitHub Actions workflow referenced above can be triggered manually. Thi
   - Click 'Run workflow'
 - Monitor the status of your stage's destruction in the repo's [Actions area](https://github.com/Enterprise-CMCS/seatool-connectors/actions).
 
-#### Notes
-
-- None
-
 ### Destroy a stage
 
-#### Summary
+#### Full Stage Destruction Summary
 
 This destroys a n entire application, so the entire stage, to AWS.
 
-#### Prerequisites:
-
 - Completed all [onboarding]({{ site.baseurl }}{% link docs/onboarding/onboarding.md %})
-
-#### Procedure
-
 - Stop and think about what you are doing. Destroying is a lot easier to avoid then to undo.
 - [Obtain and set AWS CLI credentials]({{ site.baseurl }}{%link docs/development-workflows/aws-auth.md %})
 - Destroy using the run script:
+
   ```bash
     cd seatool-connectors
     nvm use
     run destroy --stage foo
   ```
-
-#### Notes
 
 - After running the above destroy command, the script will output any Cloudformation stacks that will be deleted, and ask you to verify the stage name to proceed with destruction. If you'd like to proceed, re-enter the stage name and hit enter.
 - The destroy script will hold your terminal process open until all stacks report as DESTROY_COMPLETE in cloudformation. If a stack fails to delete, or if there is a timeout, the script will fail. You may retry the script again, but it may be worth investigating the failure.
@@ -101,25 +89,18 @@ This destroys a n entire application, so the entire stage, to AWS.
 
 ### Destroy an individual service
 
-#### Summary
+#### Single Service Destruction Summary
 
 This will destroy a single service for a given stage.
 
-#### Prerequisites:
-
 - Completed all [onboarding]({{ site.baseurl }}{% link docs/onboarding/onboarding.md %})
-
-#### Procedure
 
 - Stop and think about what you are doing. Destroying is a lot easier to avoid then to undo.
 - [Obtain and set AWS CLI credentials]({{ site.baseurl }}{%link docs/development-workflows/aws-auth.md %})
 - Destroy a single service using the run script:
+
   ```bash
     cd seatool-connectors
     nvm use
     run destroy --service bar --stage foo
   ```
-
-#### Notes
-
-- All notes from the Destroy a Stage section (above) hold true for destroying an individual service.
