@@ -8,11 +8,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup python
         uses: actions/setup-python@v2
 
-      - name: Run pre-commit
-        uses: pre-commit/action@v2.0.2
+      - uses: pre-commit/action@v2.0.2
         with:
           extra_args: --all-files
+          token: ${{ secrets.GITHUB_TOKEN }}
