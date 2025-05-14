@@ -35,11 +35,7 @@ jobs:
     environment:
       name: ${{ startsWith(github.ref_name, 'snyk-') && 'snyk' || github.ref_name }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - uses: ./.github/actions/setup
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -57,11 +53,7 @@ jobs:
     environment:
       name: ${{ startsWith(github.ref_name, 'snyk-') && 'snyk' || github.ref_name }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - uses: ./.github/actions/setup
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -77,11 +69,7 @@ jobs:
     needs:
       - test
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - uses: ./.github/actions/setup
-
       - name: Release
         run: npx semantic-release
         env:
