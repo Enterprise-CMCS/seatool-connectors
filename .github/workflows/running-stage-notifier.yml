@@ -15,7 +15,7 @@ jobs:
       contents: read
 
     steps:
-
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
 
       - name: Configure AWS credentials
