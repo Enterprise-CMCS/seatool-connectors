@@ -10,9 +10,3 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version-file: .nvmrc
-
-    - name: Node cache
-      uses: actions/cache@v4.2.3
-      with:
-        path: "**/node_modules"
-        key: ${{ github.workflow}}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock', '.nvmrc') }}
