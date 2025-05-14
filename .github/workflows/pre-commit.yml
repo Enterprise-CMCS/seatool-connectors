@@ -14,7 +14,4 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v2
 
-      - uses: pre-commit/action@v2.0.2
-        with:
-          extra_args: --all-files
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pre-commit/action@v3.0.1
