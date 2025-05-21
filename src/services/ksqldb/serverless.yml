@@ -68,14 +68,22 @@ custom:
 
 params:
   master:
+    cpu: 2048
+    heap: "-Xms7G -Xmx7G" # Was -Xms15G -Xmx15G
+    memory: 10240
+    rocksdbCache: 1073741824 # Was 10737418240
     topicNamespace: ""
   val:
+    cpu: 1024
+    heap: "-Xms2G -Xmx2G" 
+    memory: 4096
+    rocksdbCache: 536870912 # 512MB
     topicNamespace: ""
   production:
     cpu: 2048
-    heap: "-Xms15G -Xmx15G"
+    heap: "-Xms7G -Xmx7G" # Was -Xms15G -Xmx15G
     memory: 10240
-    rocksdbCache: 10737418240
+    rocksdbCache: 1073741824 # Was 10737418240
     topicNamespace: ""
   default:
     cpu: 2048
