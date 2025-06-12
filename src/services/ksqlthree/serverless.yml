@@ -62,15 +62,15 @@ custom:
 params:
   master:
     cpu: 8192
-    heap: "-Xms15G -Xmx15G"
+    heap: "-Xms14G -Xmx14G"
     memory: 32768
-    rocksdbCache: 11453246122
+    rocksdbCache: 10737418240
     topicNamespace: ""
   val:
     cpu: 8192
-    heap: "-Xms15G -Xmx15G"
+    heap: "-Xms14G -Xmx14G"
     memory: 32768
-    rocksdbCache: 11453246122
+    rocksdbCache: 10737418240
     topicNamespace: ""
   production:
     cpu: 8192
