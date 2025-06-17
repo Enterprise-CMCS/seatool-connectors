@@ -1,0 +1,61 @@
+{
+  "name": "seatool-connectors",
+  "description": "Microservice streaming CMS SEA Tool data to CMS Bigmac.",
+  "longDescription": "",
+  "status": "",
+  "permissions": {
+    "license": [
+      {
+        "name": "",
+        "URL": ""
+      }
+    ],
+    "usageType": "",
+    "exemptionText": ""
+  },
+  "organization": "",
+  "repositoryURL": "https://github.com/Enterprise-CMCS/seatool-connectors",
+  "projectURL": "",
+  "repositoryHost": "github",
+  "repositoryVisibility": "",
+  "vcs": "git",
+  "laborHours": 6240,
+  "reuseFrequency": {
+    "forks": 0,
+    "clones": 0
+  },
+  "platforms": [],
+  "categories": [],
+  "softwareType": "",
+  "languages": [
+    "JavaScript",
+    "TypeScript",
+    "Shell"
+  ],
+  "maintenance": "",
+  "contractNumber": "",
+  "date": {
+    "created": "2022-09-16T18:48:38Z",
+    "lastModified": "2025-06-17T17:56:00Z",
+    "metaDataLastUpdated": "2025-06-17T17:56:36.837Z"
+  },
+  "tags": [],
+  "contact": {
+    "email": "",
+    "name": ""
+  },
+  "feedbackMechanisms": [
+    "https://github.com/Enterprise-CMCS/seatool-connectors/issues"
+  ],
+  "localisation": false,
+  "repositoryType": "",
+  "userInput": false,
+  "fismaLevel": "",
+  "group": "",
+  "projects": [],
+  "systems": [],
+  "upstream": "",
+  "subsetInHealthcare": [],
+  "userType": [],
+  "maturityModelTier": 0
+}
