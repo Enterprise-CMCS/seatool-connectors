@@ -62,10 +62,10 @@ custom:
 
 params:
   master:
-    cpu: 8192
-    heap: "-Xms14G -Xmx14G"
-    memory: 32768
-    rocksdbCache: 10737418240
+    cpu: 2048
+    heap: "-Xms4G -Xmx4G"
+    memory: 11264
+    rocksdbCache: 4294967296
     topicNamespace: ""
   val:
     cpu: 8192
