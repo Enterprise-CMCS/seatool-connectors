@@ -62,28 +62,28 @@ custom:
 
 params:
   master:
-    cpu: 8192
-    heap: "-Xms14G -Xmx14G"
-    memory: 32768
-    rocksdbCache: 10737418240
+    cpu: 2048
+    heap: "-Xms4G -Xmx4G"
+    memory: 11264
+    rocksdbCache: 4294967296
     topicNamespace: ""
   val:
-    cpu: 8192
-    heap: "-Xms14G -Xmx14G"
-    memory: 32768
-    rocksdbCache: 10737418240
+    cpu: 2048
+    heap: "-Xms4G -Xmx4G"
+    memory: 11264
+    rocksdbCache: 4294967296
     topicNamespace: ""
   production:
-    cpu: 8192
-    heap: "-Xms14G -Xmx14G"
-    memory: 32768
-    rocksdbCache: 10737418240
+    cpu: 2048
+    heap: "-Xms4G -Xmx4G"
+    memory: 12288
+    rocksdbCache: 4294967296
     topicNamespace: ""
   default:
     cpu: 2048
     heap: "-Xms4G -Xmx4G"
-    memory: 8192
-    rocksdbCache: 2147483648
+    memory: 12288
+    rocksdbCache: 4294967296
     topicNamespace: --${self:custom.project}--${sls:stage}--
 
 layers:
