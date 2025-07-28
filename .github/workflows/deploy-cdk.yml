@@ -77,11 +77,11 @@ jobs:
         run: |
           cd cdk
           # Check if bootstrap is needed by looking for the bootstrap SSM parameter
-          if ! aws ssm get-parameter --name "/cdk-bootstrap/seatool/version" --region ${{ env.REGION_A }} >/dev/null 2>&1; then
-            echo "Bootstrapping CDK with custom qualifier..."
-            cdk bootstrap --qualifier seatool
-          else
+          if aws ssm get-parameter --name "/cdk-bootstrap/seatool/version" --region ${{ env.REGION_A }} >/dev/null 2>&1; then
             echo "CDK already bootstrapped with seatool qualifier"
+          else
+            echo "Bootstrapping CDK with custom qualifier..."
+            cdk bootstrap --qualifier seatool --toolkit-stack-name CDKToolkit-seatool
           fi
         env:
           STAGE: ${{ env.STAGE_NAME }}
