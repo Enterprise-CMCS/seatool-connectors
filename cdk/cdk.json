@@ -1,7 +1,6 @@
 {
   "app": "npx ts-node --prefer-ts-exts bin/seatool-connectors.ts",
   "requireApproval": "never",
-  "@aws-cdk/core:bootstrapQualifier": "seatool",
   "watch": {
     "include": [
       "**"
@@ -19,6 +18,7 @@
     ]
   },
   "context": {
+    "@aws-cdk/core:bootstrapQualifier": "seatool",
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
     "@aws-cdk/core:checkSecretUsage": true,
     "@aws-cdk/core:target-partitions": [
