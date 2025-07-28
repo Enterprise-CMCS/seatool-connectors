@@ -12,3 +12,12 @@ tsconfig.tsbuildinfo
 build_run
 coverage
 .clinerules/
+
+# CDK generated files
+cdk.out
+cdk/cdk.out
+*.d.ts
+*.js
+*.js.map
+!jest.config.js
+cdk-templates

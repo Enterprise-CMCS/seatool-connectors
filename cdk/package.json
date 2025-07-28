@@ -1,0 +1,28 @@
+{
+  "name": "seatool-connectors-cdk",
+  "version": "1.0.0",
+  "description": "AWS CDK infrastructure for Seatool Connectors",
+  "main": "bin/seatool-connectors.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk",
+    "synth": "cdk synth",
+    "deploy": "cdk deploy",
+    "diff": "cdk diff",
+    "destroy": "cdk destroy"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.5",
+    "@types/node": "^20.6.2",
+    "aws-cdk": "2.179.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.179.0",
+    "constructs": "^10.3.0"
+  }
+}
