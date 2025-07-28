@@ -35,6 +35,7 @@ jobs:
       - name: publish test coverage to code climate
         if: false  # Temporarily disabled due to CodeClimate download issues
         uses: paambaati/codeclimate-action@v6.0.0
+        continue-on-error: true
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
