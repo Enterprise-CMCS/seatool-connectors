@@ -23,6 +23,17 @@ Additional stacks will be added as they are migrated from Serverless Framework:
 - AWS CLI configured with appropriate credentials
 - CDK CLI: `npm install -g aws-cdk@2.179.0`
 
+## Bootstrap Namespacing
+
+This CDK project uses a custom bootstrap qualifier (`seatool`) to namespace its bootstrap resources. This allows multiple CDK projects to coexist in the same AWS account/region without conflicts.
+
+The bootstrap resources are created with names like:
+- S3 Bucket: `cdk-seatool-assets-{account}-{region}`
+- IAM Roles: `cdk-seatool-cfn-exec-role-{account}-{region}`
+- SSM Parameter: `/cdk-bootstrap/seatool/version`
+
+Other CDK projects should use their own unique qualifiers to avoid resource conflicts.
+
 ## Local Development
 
 ### Setup
@@ -63,7 +74,7 @@ yarn cdk:install
 yarn cdk:build
 
 # Bootstrap CDK (first time only)
-cd cdk && cdk bootstrap
+cd cdk && cdk bootstrap --qualifier seatool
 
 # See what will be deployed
 yarn cdk:diff
