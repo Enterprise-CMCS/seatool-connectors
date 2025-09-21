@@ -9,11 +9,17 @@
     "test": "tests"
   },
   "scripts": {
-    "coverage": "vitest run --coverage",
+    "coverage": "vitest run --coverage --config ./src/tests/vitest.config.ts",
     "test": "vitest --config ./src/tests/vitest.config.ts",
     "test-ci": "vitest run --config ./src/tests/vitest.config.ts",
     "test-gui": "vitest --ui",
-    "test-tsc": "tsc --skipLibCheck --noEmit"
+    "test-tsc": "tsc --skipLibCheck --noEmit",
+    "cdk:install": "cd cdk && yarn install",
+    "cdk:build": "cd cdk && yarn build",
+    "cdk:synth": "cd cdk && cdk synth",
+    "cdk:deploy": "cd cdk && cdk deploy --all --require-approval never",
+    "cdk:diff": "cd cdk && cdk diff",
+    "cdk:destroy": "cd cdk && cdk destroy --all --force"
   },
   "repository": {
     "type": "git",

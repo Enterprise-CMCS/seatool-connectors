@@ -5,6 +5,8 @@ on:
     branches:
       - "*"
       - "!skipci*"
+      - "!code-json-*"
+      - "!snyk-*"
 
 concurrency:
   group: ${{ startsWith(github.ref_name, 'snyk-') && 'snyk' || github.ref_name }}-group
@@ -95,6 +97,7 @@ jobs:
         id: getCfts
         run: |
           mkdir -p cftemplates
+          PROJECT=seatool
           stackList=(`aws cloudformation describe-stacks --query "Stacks[?Tags[?Key=='STAGE' && Value=='$STAGE_NAME'] && Tags[?Key=='PROJECT' && Value=='$PROJECT']].StackName" --output text`)
           for stack in "${stackList[@]}"; do
             aws cloudformation get-template --stack-name "$stack" --query TemplateBody > "cftemplates/${stack}.json"

@@ -10,39 +10,80 @@ on:
 
 jobs:
   destroy:
-    if: |
-      (
-        github.event.ref_type == 'branch' &&
-        !startsWith(github.event.ref, 'skipci') &&
-        !contains(fromJson('["master", "staging", "production"]'), github.event.ref)
-      ) ||
-      (
-        inputs.environment != '' &&
-        !contains(fromJson('["master", "staging", "production"]'), inputs.environment)
-      )
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ inputs.environment || (startsWith(github.event.ref, 'snyk-') && 'snyk' || github.event.ref) }}
-    env:
-      STAGE_NAME: ${{ inputs.environment || (startsWith(github.event.ref, 'snyk-') && 'snyk' || github.event.ref) }}
     permissions:
       id-token: write
       contents: read
+    if: |
+      (
+        github.event.ref_type == 'branch' &&
+        !startsWith(github.event.ref, 'skipci-') &&
+        !startsWith(github.event.ref, 'code-json-') &&
+        !startsWith(github.event.ref, 'snyk-') &&
+        !contains(fromJson('["master", "val", "production"]'), github.event.ref)
+      ) ||
+      (
+        github.event_name == 'workflow_dispatch' &&
+        inputs.environment != '' &&
+        !startsWith(inputs.environment, 'skipci-') &&
+        !startsWith(inputs.environment, 'code-json-') &&
+        !startsWith(inputs.environment, 'snyk-') &&
+        !contains(fromJson('["master", "val", "production"]'), inputs.environment)
+      )
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup
-
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_TO_ASSUME }}
           aws-region: us-east-1
-          role-duration-seconds: 10800
 
-      - name: Destroy
-        run: run destroy --stage $STAGE_NAME --verify false
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install and run Stage Destroyer
+        run: |
+          npm install -g sls-stage-destroyer
+          destroy-stage "${{ inputs.environment || github.event.ref }}" \
+            --no-verify \
+            --no-wait \
+            --retries 3 \
+            --region us-east-1
+        env:
+          CI: true
+
+      - name: Install CDK CLI and dependencies
+        run: |
+          echo "Installing CDK CLI..."
+          npm install -g aws-cdk@2.179.0
+          echo "Installing CDK dependencies..."
+          cd cdk && npm install
+
+      - name: Build CDK
+        run: cd cdk && npm run build
+
+      - name: List CDK stacks
+        run: |
+          echo "Listing CDK stacks to be destroyed:"
+          cd cdk && cdk list
+        env:
+          STAGE: ${{ inputs.environment || github.event.ref }}
+          PROJECT: seatool
+          REGION_A: us-east-1
+
+      - name: Destroy CDK Infrastructure
+        run: |
+          echo "Destroying CDK infrastructure for stage: ${{ inputs.environment || github.event.ref }}"
+          cd cdk && cdk destroy --all --force
+        env:
+          STAGE: ${{ inputs.environment || github.event.ref }}
+          PROJECT: seatool
+          REGION_A: us-east-1
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
@@ -55,11 +96,13 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   delete_environment:
-    needs: destroy
     runs-on: ubuntu-latest
+    needs: destroy
+    if: always()
     steps:
-      - uses: strumwolf/delete-deployment-environment@v2
+      - name: Delete Environment
+        uses: strumwolf/delete-deployment-environment@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: ${{ inputs.environment || (startsWith(github.event.ref, 'snyk-') && 'snyk' || github.event.ref) }}
-          onlyRemoveDeployments: true
+          environment: ${{ inputs.environment || github.event.ref }}
+          ref: ${{ github.ref }}
