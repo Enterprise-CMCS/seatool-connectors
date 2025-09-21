@@ -1,35 +1,59 @@
 ---
-name: Bug
-about: Something's Broken
-title: ""
+name: Bug Report
+about: Report a bug or issue with the project
+title: "[Bug]: "
 labels: bug
 assignees: ""
 ---
 
-## Type of Issue:
+## 🐛 Bug Description
 
-- [x] Bug: Something isn't working
+**What's broken?**
+A clear and concise description of what the bug is and what you expected to happen.
 
-#### Issue Creator Checklist
+**Impact**
+Describe the impact on users, operations, or the system.
 
-- [ ] This issue has been thoroughly documented below; a developer should be able to understand the issue by reading it.
+## 🔍 Reproduction Steps
 
-## What's broken?
+**Steps to reproduce the behavior:**
+1. Go to '...'
+2. Click on '...'
+3. Scroll down to '...'
+4. See error
 
-_List a description of the bad behavior or failure. Please be as detailed as possible. Attach screenshots if appropriate_
+**Expected behavior**
+A clear description of what you expected to happen.
 
-## What's the impact of this bug?
+**Actual behavior**
+A clear description of what actually happened.
 
-_What's the impact to the end user experience and/or application in general_
+## 🌍 Environment
 
-## Steps to Reproduce?
+**Please complete the following information:**
+- **OS**: [e.g., macOS, Linux, Windows]
+- **Browser/Client**: [e.g., Chrome, Safari, CLI]
+- **Version**: [e.g., 1.0.0, latest]
+- **Environment**: [e.g., dev, val, production]
 
-_If applicable, list steps to reproduce the issue_
+## 📎 Additional Context
 
-## Assorted Notes/Considerations
+**Screenshots or Logs**
+If applicable, add screenshots, error logs, or stack traces to help explain the problem.
 
-_List any other information that you think is important_
+**Related Issues**
+Link any related issues or PRs that might be relevant.
 
-## AC:
+## ✅ Acceptance Criteria
 
-_List the acceptance criteria for this issue._
+**This issue will be considered resolved when:**
+- [ ] The bug is fixed and the expected behavior occurs
+- [ ] Appropriate tests are added to prevent regression
+- [ ] Documentation is updated if necessary
+
+---
+
+### 📋 Issue Creator Checklist
+- [ ] I have searched existing issues to ensure this is not a duplicate
+- [ ] I have provided all the requested information above
+- [ ] I have included reproduction steps that are clear and complete

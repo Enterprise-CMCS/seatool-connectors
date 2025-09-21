@@ -1,23 +1,48 @@
 ---
-name: Question
-about: Request for more information
-title: ""
+name: Question/Support
+about: Ask a question or request support
+title: "[Question]: "
 labels: question
 assignees: ""
 ---
 
-## Type of Issue:
+## ❓ Question
 
-- [x] Question: Further information is requested (I have a question)
+**What would you like to know?**
+Clearly state your question or what information you're looking for.
 
-#### Issue Creator Checklist
+## 🔍 Context
 
-- [ ] This issue has been thoroughly documented below; a developer should be able to understand the issue by reading it.
+**Background information**
+Provide context about what you're trying to accomplish or the situation that led to this question.
 
-## Question / Request for more Info
+**What have you already tried?**
+Describe any research, documentation review, or troubleshooting steps you've already attempted.
 
-_What's your question? Or, what would you like more information on? Don't be afraid to use plain english_
+## 🌍 Environment (if applicable)
 
-## AC:
+**System details:**
+- **Environment**: [e.g., dev, val, production, local]
+- **Component**: [e.g., specific service, stack, or feature]
+- **Version**: [e.g., latest, specific version]
 
-_List the acceptance criteria for this issue. "Answering the question" is acceptable here._
+## 📎 Additional Information
+
+**Related documentation**
+Link any documentation, previous issues, or resources you've already consulted.
+
+**Screenshots/Logs**
+If applicable, include screenshots, command output, or log excerpts that provide context.
+
+## 🎯 Desired Outcome
+
+**What would a good answer include?**
+Help us understand what type of information or guidance would be most helpful.
+
+---
+
+### 📋 Issue Creator Checklist
+- [ ] I have searched existing issues and documentation
+- [ ] I have provided clear context and background
+- [ ] I have described what I've already tried
+- [ ] I have clearly stated what information I'm seeking
