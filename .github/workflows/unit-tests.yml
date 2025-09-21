@@ -18,7 +18,7 @@ jobs:
         run: run install
       - run: yarn run coverage
       - name: publish test coverage to code climate
-        if: always() && env.CC_TEST_REPORTER_ID != ''
+        if: false  # Temporarily disabled due to CodeClimate download issues
         uses: paambaati/codeclimate-action@v6.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
