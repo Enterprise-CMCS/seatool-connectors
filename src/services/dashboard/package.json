@@ -1,5 +1,6 @@
 {
   "name": "dashboard",
+  "version": "1.0.0",
   "dependencies": {},
   "devDependencies": {
     "@aws-sdk/client-cloudwatch": "^3.209.0",
