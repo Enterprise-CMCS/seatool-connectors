@@ -1,15 +1,22 @@
 name: Create Release PR - val
 
 on:
-  push:
-    branches: master
+  workflow_run:
+    workflows: ["Deploy"]
+    types:
+      - completed
+    branches: ["master"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   pull-request:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Create Pull Request
         uses: repo-sync/pull-request@v2
         with:

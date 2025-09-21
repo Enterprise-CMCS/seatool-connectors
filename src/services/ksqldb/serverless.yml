@@ -15,7 +15,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   region: ${env:REGION_A}
   stackTags:
     PROJECT: ${self:custom.project}
@@ -68,22 +68,22 @@ custom:
 
 params:
   master:
-    cpu: 2048
-    heap: "-Xms7G -Xmx7G" # Was -Xms15G -Xmx15G
-    memory: 10240
-    rocksdbCache: 1073741824 # Was 10737418240
+    cpu: 2048 # 2 vCPU - optimal for current workload
+    heap: "-Xms6G -Xmx6G" # 6GB heap - better fit in 12GB container
+    memory: 12288 # 12GB total (6GB heap + 1GB cache + 5GB headroom)
+    rocksdbCache: 1073741824 # 1GB RocksDB cache
     topicNamespace: ""
   val:
-    cpu: 1024
-    heap: "-Xms2G -Xmx2G" 
-    memory: 4096
-    rocksdbCache: 536870912 # 512MB
+    cpu: 1024 # 1 vCPU - sufficient for validation
+    heap: "-Xms3G -Xmx3G" # 3GB heap - more reasonable for testing
+    memory: 7168 # 7GB total (3GB heap + 512MB cache + 3.5GB headroom)
+    rocksdbCache: 536870912 # 512MB cache
     topicNamespace: ""
   production:
-    cpu: 2048
-    heap: "-Xms7G -Xmx7G" # Was -Xms15G -Xmx15G
-    memory: 10240
-    rocksdbCache: 1073741824 # Was 10737418240
+    cpu: 2048 # 2 vCPU - same as master
+    heap: "-Xms6G -Xmx6G" # 6GB heap
+    memory: 12288 # 12GB total (6GB heap + 1GB cache + 5GB headroom)
+    rocksdbCache: 1073741824 # 1GB RocksDB cache
     topicNamespace: ""
   default:
     cpu: 2048
