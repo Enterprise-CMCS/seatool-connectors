@@ -16,7 +16,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs22.x
   region: ${env:REGION_A}
   stackTags:
     PROJECT: ${self:custom.project}
@@ -92,6 +92,9 @@ params:
     topicNamespace: ""
   production:
     topicNamespace: ""
+    cpu: 2048
+    memory: 4096
+    maxContainerMemory: 1024
   default:
     cpu: 256
     maxContainerCpu: 128
