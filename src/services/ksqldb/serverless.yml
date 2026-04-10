@@ -15,7 +15,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs22.x
   region: ${env:REGION_A}
   stackTags:
     PROJECT: ${self:custom.project}
@@ -80,9 +80,9 @@ params:
     rocksdbCache: 536870912 # 512MB cache
     topicNamespace: ""
   production:
-    cpu: 2048 # 2 vCPU - same as master
-    heap: "-Xms6G -Xmx6G" # 6GB heap
-    memory: 12288 # 12GB total (6GB heap + 1GB cache + 5GB headroom)
+    cpu: 8192 # 8 vCPU - increased for processing headroom
+    heap: "-Xms10G -Xmx10G" # 10GB heap - increased for 16GB container
+    memory: 16384 # 16GB total (10GB heap + 1GB cache + 5GB headroom)
     rocksdbCache: 1073741824 # 1GB RocksDB cache
     topicNamespace: ""
   default:
