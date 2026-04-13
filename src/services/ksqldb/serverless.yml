@@ -15,7 +15,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs22.x
   region: ${env:REGION_A}
   stackTags:
     PROJECT: ${self:custom.project}
@@ -72,24 +72,32 @@ params:
     heap: "-Xms6G -Xmx6G" # 6GB heap - better fit in 12GB container
     memory: 12288 # 12GB total (6GB heap + 1GB cache + 5GB headroom)
     rocksdbCache: 1073741824 # 1GB RocksDB cache
+    interactiveCpu: 2048
+    interactiveMemory: 12288
     topicNamespace: ""
   val:
     cpu: 1024 # 1 vCPU - sufficient for validation
     heap: "-Xms3G -Xmx3G" # 3GB heap - more reasonable for testing
     memory: 7168 # 7GB total (3GB heap + 512MB cache + 3.5GB headroom)
     rocksdbCache: 536870912 # 512MB cache
+    interactiveCpu: 1024
+    interactiveMemory: 7168
     topicNamespace: ""
   production:
-    cpu: 2048 # 2 vCPU - same as master
-    heap: "-Xms6G -Xmx6G" # 6GB heap
-    memory: 12288 # 12GB total (6GB heap + 1GB cache + 5GB headroom)
+    cpu: 8192 # 8 vCPU - matches the current headless production task
+    heap: "-Xms6G -Xmx6G" # 6GB heap - matches the current headless production task
+    memory: 16384 # 16GB total for the current production headless task
     rocksdbCache: 1073741824 # 1GB RocksDB cache
+    interactiveCpu: 2048
+    interactiveMemory: 12288
     topicNamespace: ""
   default:
     cpu: 2048
     heap: "-Xms4G -Xmx4G"
     memory: 8192
     rocksdbCache: 2147483648
+    interactiveCpu: 2048
+    interactiveMemory: 8192
     topicNamespace: --${self:custom.project}--${sls:stage}--
 
 layers:
@@ -273,8 +281,8 @@ resources:
         TaskRoleArn: !GetAtt ksqldbHeadlessRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: ${param:memory}
-        Cpu: ${param:cpu}
+        Memory: ${param:interactiveMemory}
+        Cpu: ${param:interactiveCpu}
         EphemeralStorage:
           SizeInGiB: 200
         Tags:
