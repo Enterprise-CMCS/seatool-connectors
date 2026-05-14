@@ -1,6 +1,7 @@
 {
   "name": "libs",
   "version": "1.0.0",
+  "private": true,
   "dependencies": {
     "@aws-sdk/client-cloudwatch": "^3.529.0",
     "@aws-sdk/client-ecs": "^3.529.0",

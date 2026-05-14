@@ -1,5 +1,6 @@
 {
   "name": "oidc",
+  "private": true,
   "dependencies": {},
   "devDependencies": {}
 }
