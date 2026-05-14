@@ -102,7 +102,7 @@
     "@smithy/types" "^4.14.1"
     tslib "^2.6.2"
 
-"@aws-sdk/client-cloudwatch@^3.209.0", "@aws-sdk/client-cloudwatch@^3.507.0":
+"@aws-sdk/client-cloudwatch@^3.209.0", "@aws-sdk/client-cloudwatch@^3.529.0":
   version "3.1047.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/client-cloudwatch/-/client-cloudwatch-3.1047.0.tgz#121e6b70adf8f3838f81e46d88ac1bde103cda55"
   integrity sha512-RZq++indvKBJTVaiwWW7j+eQjvN6LEjAIWMzpfkgeoN+1LJ2Hqn0ONvVtL2N7/9R63BEOs3ZWeh9EvvrfybWiw==
@@ -127,7 +127,7 @@
     "@smithy/types" "^4.14.1"
     tslib "^2.6.2"
 
-"@aws-sdk/client-ecs@^3.499.0":
+"@aws-sdk/client-ecs@^3.529.0":
   version "3.1047.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/client-ecs/-/client-ecs-3.1047.0.tgz#e33a1a449b6aa4283eaea314bc0a8a50e68cdcf9"
   integrity sha512-2JNv+pmC7X2A6qmZJBKIKIju6wN1uSMJ/1k0onLgRZIg1UDAomzzDrV3JXyltOqnmNxXFYDc8B+FRrT5Yimx1A==
@@ -8618,7 +8618,7 @@ lodash@4.17.x:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.23.tgz#f113b0378386103be4f6893388c73d0bde7f2c5a"
   integrity sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==
 
-lodash@^4.17.11, lodash@^4.17.15, lodash@^4.17.21, lodash@^4.17.23, lodash@^4.17.4:
+lodash@^4.17.11, lodash@^4.17.15, lodash@^4.17.21, lodash@^4.17.23, lodash@^4.17.4, lodash@^4.18.1:
   version "4.18.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.18.1.tgz#ff2b66c1f6326d59513de2407bf881439812771c"
   integrity sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==
