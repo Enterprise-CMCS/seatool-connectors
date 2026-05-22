@@ -74,9 +74,9 @@ params:
     rocksdbCache: 2147483648 # 2GB RocksDB cache
     topicNamespace: ""
   production:
-    cpu: 4096 # 4 vCPU - same as master for consistency
+    cpu: 8192 # 8 vCPU - CPU max ~95% at 4096; mirrors ksqldb-production upgrade
     heap: "-Xms8G -Xmx8G" # 8GB heap
-    memory: 20480 # 20GB total (8GB heap + 4GB cache + 8GB headroom)
+    memory: 16384 # 16GB total - Fargate minimum for 8 vCPU (~32% mem utilization at 20GB)
     rocksdbCache: 4294967296 # 4GB RocksDB cache
     topicNamespace: ""
   default:
@@ -212,7 +212,7 @@ resources:
                 cat /home/appuser/headless.sql &&
                 wget https://ksqldb-maven.s3-us-west-2.amazonaws.com/maven/io/confluent/ksql/ksql-rocksdb-config-setter/0.7.1/ksql-rocksdb-config-setter-0.7.1.jar -O /usr/share/java/ksqldb-rest-app/ksql-rocksdb-config-setter-0.7.1.jar &&
                 echo "ksql.streams.rocksdb.config.setter=io.confluent.ksql.rocksdb.KsqlBoundedMemoryRocksDBConfigSetter" >> /etc/ksqldb/ksqldb-server.properties &&
-                echo "ksql.plugins.rocksdb.cache.size={param:rocksdbCache}" >> /etc/ksqldb/ksqldb-server.properties &&
+                echo "ksql.plugins.rocksdb.cache.size=${param:rocksdbCache}" >> /etc/ksqldb/ksqldb-server.properties &&
                 echo "ksql.plugins.rocksdb.write.buffer.cache.use=true" >> /etc/ksqldb/ksqldb-server.properties &&
                 echo "ksql.plugins.rocksdb.num.background.threads=1" >> /etc/ksqldb/ksqldb-server.properties &&
                 /usr/bin/docker/run
