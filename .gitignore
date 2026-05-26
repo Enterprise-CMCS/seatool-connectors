@@ -12,3 +12,5 @@ tsconfig.tsbuildinfo
 build_run
 coverage
 .clinerules/
+.cursor/*
+.timestamp-issue/*
