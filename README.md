@@ -1,9 +1,6 @@
 <h1 align="center" style="border-bottom: none;">seatool-connectors</h1>
 <h3 align="center">Service for comparing legacy/seatool data and sending notifications.</h3>
 <p align="center">
-  <a href="https://Enterprise-CMCS.github.io/seatool-connectors/">
-    <img alt="Docs" src="https://img.shields.io/badge/Docs-Pages-blue.svg">
-  </a>
   <a href="https://cmsgov.slack.com/archives/C047RBDL396">
     <img alt="Slack" src="https://img.shields.io/badge/Slack-seatool--connectors-purple.svg">
   </a>
@@ -23,15 +20,9 @@
 
 ---
 
-### Please visit our [seatool-connectors docs site](https://Enterprise-CMCS.github.io/seatool-connectors/) for complete documentation.
-
----
-
 ## Overview
 
 The seatool-connectors project (oftened referenced in the context of this repository as just 'seatool') is a microservice that sends CMS Sea Tool data to CMS Bigmac.
-
-![Architecture Diagram](docs/assets/architecture.svg)
 
 ## Contributing
 

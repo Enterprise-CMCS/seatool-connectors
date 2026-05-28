@@ -2,6 +2,7 @@
   "name": "alerts",
   "version": "1.0.0",
   "description": "",
+  "private": true,
   "main": "handler.js",
   "author": "",
   "license": "ISC",

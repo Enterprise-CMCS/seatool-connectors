@@ -76,10 +76,10 @@ params:
     interactiveMemory: 12288
     topicNamespace: ""
   val:
-    cpu: 1024 # 1 vCPU - sufficient for validation
-    heap: "-Xms3G -Xmx3G" # 3GB heap - more reasonable for testing
-    memory: 7168 # 7GB total (3GB heap + 512MB cache + 3.5GB headroom)
-    rocksdbCache: 536870912 # 512MB cache
+    cpu: 8192 # 8 vCPU - production parity; val headless was 100% on 1024 (master still ~99% at 2048)
+    heap: "-Xms6G -Xmx6G" # 6GB heap - matches production headless
+    memory: 16384 # 16GB total - matches production headless task
+    rocksdbCache: 1073741824 # 1GB RocksDB cache
     interactiveCpu: 1024
     interactiveMemory: 7168
     topicNamespace: ""
@@ -227,7 +227,7 @@ resources:
                 cat /home/appuser/headless.sql &&
                 wget https://ksqldb-maven.s3-us-west-2.amazonaws.com/maven/io/confluent/ksql/ksql-rocksdb-config-setter/0.7.1/ksql-rocksdb-config-setter-0.7.1.jar -O /usr/share/java/ksqldb-rest-app/ksql-rocksdb-config-setter-0.7.1.jar &&
                 echo "ksql.streams.rocksdb.config.setter=io.confluent.ksql.rocksdb.KsqlBoundedMemoryRocksDBConfigSetter" >> /etc/ksqldb/ksqldb-server.properties &&
-                echo "ksql.plugins.rocksdb.cache.size={param:rocksdbCache}" >> /etc/ksqldb/ksqldb-server.properties &&
+                echo "ksql.plugins.rocksdb.cache.size=${param:rocksdbCache}" >> /etc/ksqldb/ksqldb-server.properties &&
                 echo "ksql.plugins.rocksdb.write.buffer.cache.use=true" >> /etc/ksqldb/ksqldb-server.properties &&
                 echo "ksql.plugins.rocksdb.num.background.threads=1" >> /etc/ksqldb/ksqldb-server.properties &&
                 /usr/bin/docker/run
@@ -281,8 +281,8 @@ resources:
         TaskRoleArn: !GetAtt ksqldbHeadlessRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: ${param:interactiveMemory}
-        Cpu: ${param:interactiveCpu}
+        Memory: ${param:memory}
+        Cpu: ${param:cpu}
         EphemeralStorage:
           SizeInGiB: 200
         Tags:
@@ -414,8 +414,8 @@ resources:
         TaskRoleArn: !GetAtt ksqldbHeadlessRole.Arn
         RequiresCompatibilities:
           - FARGATE
-        Memory: ${param:memory}
-        Cpu: ${param:cpu}
+        Memory: ${param:interactiveMemory}
+        Cpu: ${param:interactiveCpu}
         EphemeralStorage:
           SizeInGiB: 50
         Tags:

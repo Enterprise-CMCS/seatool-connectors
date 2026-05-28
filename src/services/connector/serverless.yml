@@ -88,12 +88,21 @@ custom:
 params:
   master:
     topicNamespace: ""
+    cpu: 2048
+    memory: 4096
+    maxContainerCpu: 128
+    maxContainerMemory: 1024
   val:
     topicNamespace: ""
+    cpu: 2048
+    memory: 4096
+    maxContainerCpu: 128
+    maxContainerMemory: 1024
   production:
     topicNamespace: ""
     cpu: 2048
     memory: 4096
+    maxContainerCpu: 128
     maxContainerMemory: 1024
   default:
     cpu: 256
