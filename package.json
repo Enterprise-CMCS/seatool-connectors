@@ -48,7 +48,7 @@
     "serverless-plugin-warmup": "^7.1.0",
     "serverless-stack-termination-protection": "^2.0.2",
     "typescript": "^5.0.0",
-    "vitest": "^0.29.8"
+    "vitest": "^4.1.0"
   },
   "workspaces": [
     "src/libs",
