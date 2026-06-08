@@ -123,6 +123,21 @@ yargs(process.argv.slice(2))
     }
   )
   .command(
+    "test",
+    "run available validation checks",
+    {
+      stage: { type: "string", demandOption: true },
+    },
+    async (_options) => {
+      await install_deps_for_services();
+      await runner.run_command_and_output(
+        `Type Check`,
+        ["yarn", "test-tsc"],
+        "."
+      );
+    }
+  )
+  .command(
     "destroy",
     "destroy a stage in AWS",
     {
