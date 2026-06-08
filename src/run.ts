@@ -28,19 +28,41 @@ async function frozenInstall(runner: LabeledProcessRunner, dir: string) {
   );
 }
 
+async function install(runner: LabeledProcessRunner, dir: string) {
+  await runner.run_command_and_output(
+    `${dir.split("/").slice(-1)} deps`,
+    ["yarn", "install"],
+    dir
+  );
+}
+
 async function install_deps(runner: LabeledProcessRunner, dir: string) {
+  const lockfile = `${dir}/yarn.lock`;
+  const marker = `${dir}/.yarn_install`;
+  const packageJson = `${dir}/package.json`;
+  const hasLockfile = fs.existsSync(lockfile);
+  const changedSinceLastInstall = !fs.existsSync(marker)
+    ? true
+    : hasLockfile
+      ? fs.statSync(marker).ctimeMs < fs.statSync(lockfile).ctimeMs
+      : fs.statSync(marker).ctimeMs < fs.statSync(packageJson).ctimeMs;
+
   if (process.env.CI == "true") {
     if (!fs.existsSync(`${dir}/node_modules`)) {
-      await frozenInstall(runner, dir);
+      if (hasLockfile) {
+        await frozenInstall(runner, dir);
+      } else {
+        await install(runner, dir);
+      }
     }
   } else {
-    if (
-      !fs.existsSync(`${dir}/.yarn_install`) ||
-      fs.statSync(`${dir}/.yarn_install`).ctimeMs <
-        fs.statSync(`${dir}/yarn.lock`).ctimeMs
-    ) {
-      await frozenInstall(runner, dir);
-      touch(`${dir}/.yarn_install`);
+    if (changedSinceLastInstall) {
+      if (hasLockfile) {
+        await frozenInstall(runner, dir);
+      } else {
+        await install(runner, dir);
+      }
+      touch(marker);
     }
   }
 }
@@ -62,7 +84,7 @@ function getDirectories(path: string) {
 async function refreshOutputs(stage: string) {
   await runner.run_command_and_output(
     `SLS Refresh Outputs`,
-    ["sls", "refresh-outputs", "--stage", stage],
+    ["./node_modules/.bin/sls", "refresh-outputs", "--stage", stage],
     ".",
     true
   );
@@ -81,11 +103,16 @@ yargs(process.argv.slice(2))
     },
     async (options) => {
       await install_deps_for_services();
-      var deployCmd = ["sls", "deploy", "--stage", options.stage];
+      var deployCmd = [
+        "./node_modules/.bin/sls",
+        "deploy",
+        "--stage",
+        options.stage,
+      ];
       if (options.service) {
         await refreshOutputs(options.stage);
         deployCmd = [
-          "sls",
+          "./node_modules/.bin/sls",
           options.service,
           "deploy",
           "--stage",
@@ -97,28 +124,19 @@ yargs(process.argv.slice(2))
   )
   .command(
     "test",
-    "run any available tests.",
+    "run available validation checks",
     {
       stage: { type: "string", demandOption: true },
     },
-    async (options) => {
+    async (_options) => {
       await install_deps_for_services();
-      await refreshOutputs(options.stage);
       await runner.run_command_and_output(
-        `Unit Tests`,
-        ["yarn", "test-ci"],
+        `Type Check`,
+        ["yarn", "test-tsc"],
         "."
       );
     }
   )
-  .command("test-gui", "open unit-testing gui for vitest.", {}, async () => {
-    await install_deps_for_services();
-    await runner.run_command_and_output(
-      `Unit Tests`,
-      ["yarn", "test-gui"],
-      "."
-    );
-  })
   .command(
     "destroy",
     "destroy a stage in AWS",
@@ -161,7 +179,13 @@ yargs(process.argv.slice(2))
       await refreshOutputs(options.stage);
       await runner.run_command_and_output(
         `SLS connect`,
-        ["sls", options.service, "connect", "--stage", options.stage],
+        [
+          "./node_modules/.bin/sls",
+          options.service,
+          "connect",
+          "--stage",
+          options.stage,
+        ],
         "."
       );
     }
