@@ -5,6 +5,37 @@ import type {
   Context,
 } from "aws-lambda";
 
+type DashboardTemplateInputs = {
+  accountId: string;
+  region: string;
+  service: string;
+  stage: string;
+};
+
+type CloudWatchDashboardClient = Pick<CloudWatch, "getDashboard">;
+
+export function templatizeDashboardBody(
+  dashboardBody: string,
+  { accountId, region, service, stage }: DashboardTemplateInputs
+) {
+  return dashboardBody
+    .replaceAll(accountId, "${aws:accountId}")
+    .replaceAll(stage, "${sls:stage}")
+    .replaceAll(region, "${env:REGION_A}")
+    .replaceAll(service, "${self:service}");
+}
+
+export async function getTemplatizedDashboard(
+  inputs: DashboardTemplateInputs,
+  client: CloudWatchDashboardClient = new CloudWatch({})
+) {
+  const dashboard = await client.getDashboard({
+    DashboardName: `${inputs.service}-${inputs.stage}`,
+  });
+
+  return templatizeDashboardBody(dashboard.DashboardBody!, inputs);
+}
+
 export const handler = async (
   _event: APIGatewayEvent,
   _context: Context,
@@ -16,15 +47,10 @@ export const handler = async (
   const stage = process.env.stage!;
   const region = process.env.region!;
 
-  const client = new CloudWatch({});
-  const dashboard = await client.getDashboard({
-    DashboardName: `${service}-${stage}`,
+  return getTemplatizedDashboard({
+    accountId,
+    region,
+    service,
+    stage,
   });
-  const templateJson = dashboard
-    .DashboardBody!.replaceAll(accountId, "${aws:accountId}")
-    .replaceAll(stage, "${sls:stage}")
-    .replaceAll(region, "${env:REGION_A}")
-    .replaceAll(service, "${self:service}");
-
-  return templateJson;
 };
