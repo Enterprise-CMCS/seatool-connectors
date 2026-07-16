@@ -1,7 +1,7 @@
 import * as connect from "./../../../libs/connect-lib";
 import { connectors } from "../libs/connectors";
 
-async function myHandler(event, context, callback) {
+async function myHandler(event, context) {
   await connect.putConnectors(
     process.env.cluster,
     process.env.service,
