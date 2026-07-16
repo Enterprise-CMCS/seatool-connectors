@@ -3,7 +3,7 @@ import { sendMetricData } from "../../../libs/cloudwatch-lib";
 import { connectors } from "../libs/connectors";
 
 // test the connector status
-async function myHandler(event, context, callback) {
+async function myHandler(event, context) {
   const cluster = process.env.cluster;
   const service = process.env.service;
   const RUNNING = "RUNNING";

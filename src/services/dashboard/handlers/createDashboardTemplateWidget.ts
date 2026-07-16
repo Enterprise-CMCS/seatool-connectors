@@ -1,13 +1,8 @@
-import type {
-  APIGatewayEvent,
-  APIGatewayProxyCallback,
-  Context,
-} from "aws-lambda";
+import type { APIGatewayEvent, Context } from "aws-lambda";
 
 export const handler = async (
   _event: APIGatewayEvent,
-  _context: Context,
-  _callback: APIGatewayProxyCallback
+  _context: Context
 ) => {
   const lambdaArnToCall = process.env.lambdaArnToCall;
   try {
