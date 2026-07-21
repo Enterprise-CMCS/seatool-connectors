@@ -16,9 +16,11 @@ if ! which node > /dev/null ; then
 	exit 1
 fi
 
-# check node version
-if ! diff  <(cat .nvmrc | tr -d '\n') <(node -v | tr -d '\n') > /dev/null ; then
-	echo "node version does not match the version required in .nvmrc"
+# check node major version matches .nvmrc (e.g. v24 matches v24.x.y)
+required_major="$(tr -d '[:space:]vV' < .nvmrc | cut -d. -f1)"
+current_major="$(node -v | tr -d 'vV' | cut -d. -f1)"
+if [ -z "$required_major" ] || [ "$current_major" != "$required_major" ]; then
+	echo "node major version does not match .nvmrc (required: ${required_major:-unknown}, current: $(node -v))"
 	echo "If using nvm, run 'nvm use'"
 	exit 1
 fi

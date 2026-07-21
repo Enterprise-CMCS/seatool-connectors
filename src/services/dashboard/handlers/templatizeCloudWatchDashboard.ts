@@ -1,9 +1,5 @@
 import { CloudWatch } from "@aws-sdk/client-cloudwatch";
-import type {
-  APIGatewayEvent,
-  APIGatewayProxyCallback,
-  Context,
-} from "aws-lambda";
+import type { APIGatewayEvent, Context } from "aws-lambda";
 
 type DashboardTemplateInputs = {
   accountId: string;
@@ -38,8 +34,7 @@ export async function getTemplatizedDashboard(
 
 export const handler = async (
   _event: APIGatewayEvent,
-  _context: Context,
-  _callback: APIGatewayProxyCallback
+  _context: Context
 ) => {
   //environment variables passed to lambda from serverless.yml
   const service = process.env.service!;
