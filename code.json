@@ -1,5 +1,6 @@
 {
   "name": "seatool-connectors",
+  "version": "",
   "description": "Microservice streaming CMS SEA Tool data to CMS Bigmac.",
   "longDescription": "The seatool-connectors project is a comprehensive microservice that streams CMS SEA Tool data to CMS Bigmac using Apache Kafka Connect and Debezium connectors. This serverless monorepo consists of multiple integrated services including data connectors, alerting systems, monitoring dashboards, and stream processing capabilities. The system deploys Kafka Connect docker containers into AWS ECS Fargate, which run Debezium connectors to stream real-time changes from SEA Tool's MSSQL Server database. The architecture includes automated alerting through AWS CloudWatch and SNS, comprehensive monitoring dashboards, and robust error handling. Built using modern serverless technologies, this solution enables real-time data integration between legacy CMS systems and modern data platforms, supporting critical Medicare and Medicaid operations with high reliability and scalability.",
   "status": "Production",
@@ -15,17 +16,28 @@
   },
   "organization": "Centers for Medicare & Medicaid Services",
   "repositoryURL": "https://github.com/Enterprise-CMCS/seatool-connectors",
-  "projectURL": "https://github.com/Enterprise-CMCS/seatool-connectors",
   "repositoryHost": "github.com/Enterprise-CMCS",
   "repositoryVisibility": "public",
+  "homepageURL": "",
+  "downloadURL": "",
+  "disclaimerURL": "",
+  "disclaimerText": "",
   "vcs": "git",
-  "laborHours": 6240,
+  "laborHours": 5714,
   "reuseFrequency": {
     "forks": 0,
     "clones": 0
   },
-  "platforms": ["web", "linux", "other"],
-  "categories": ["data-analytics", "data-collection", "it-development"],
+  "platforms": [
+    "web",
+    "linux",
+    "other"
+  ],
+  "categories": [
+    "data-analytics",
+    "data-collection",
+    "it-development"
+  ],
   "softwareType": "standalone/backend",
   "languages": [
     "JavaScript",
@@ -33,29 +45,60 @@
     "Shell"
   ],
   "maintenance": "contract",
-  "contractNumber": "75FCMC24F0027",
+  "contractNumber": [
+    "75FCMC24F0027"
+  ],
+  "SBOM": "https://github.com/Enterprise-CMCS/seatool-connectors/network/dependencies",
+  "relatedCode": [],
+  "reusedCode": [],
+  "partners": [],
   "date": {
     "created": "2022-09-16T18:48:38Z",
-    "lastModified": "2025-06-17T17:56:00Z",
-    "metaDataLastUpdated": "2025-06-17T17:56:36.837Z"
+    "lastModified": "2026-07-16T22:12:59Z",
+    "metadataLastUpdated": "2026-09-01T00:58:37.300Z"
   },
-  "tags": ["cms", "kafka", "debezium", "data-streaming", "healthcare", "seatool", "bigmac", "serverless", "aws"],
+  "tags": [
+    "cms",
+    "kafka",
+    "debezium",
+    "data-streaming",
+    "healthcare",
+    "seatool",
+    "bigmac",
+    "serverless",
+    "aws"
+  ],
   "contact": {
     "email": "bpaige@gswell.com",
     "name": "Benjamin Paige"
   },
-  "feedbackMechanisms": [
-    "https://github.com/Enterprise-CMCS/seatool-connectors/issues"
-  ],
+  "feedbackMechanism": "https://github.com/Enterprise-CMCS/seatool-connectors/issues",
+  "AIUseCaseID": "0",
   "localisation": false,
   "repositoryType": "application",
   "userInput": false,
   "fismaLevel": "Moderate",
   "group": "MACPRO Platform Team",
-  "projects": ["seatool-connectors"],
-  "systems": ["AWS Lambda", "AWS ECS", "AWS SNS", "AWS CloudWatch", "Kafka Connect", "Debezium", "MSSQL Server"],
-  "upstream": "https://github.com/Enterprise-CMCS/seatool-connectors/network/dependencies",
-  "subsetInHealthcare": ["Policy", "Operational", "Medicare", "Medicaid"],
-  "userType": ["Government"],
+  "projects": [
+    "seatool-connectors"
+  ],
+  "systems": [
+    "AWS Lambda",
+    "AWS ECS",
+    "AWS SNS",
+    "AWS CloudWatch",
+    "Kafka Connect",
+    "Debezium",
+    "MSSQL Server"
+  ],
+  "subsetInHealthcare": [
+    "Policy",
+    "Operational",
+    "Medicare",
+    "Medicaid"
+  ],
+  "userType": [
+    "Government"
+  ],
   "maturityModelTier": 3
 }
