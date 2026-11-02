@@ -537,6 +537,10 @@ resources:
               - /tmp/CrowdStrike/rootfs/lib64
               - /tmp/CrowdStrike/rootfs/bin/bash
               - /tmp/CrowdStrike/rootfs/entrypoint-ecs.sh
+            # Falcon wraps the image ENTRYPOINT; without Command the sensor exits
+            # with "no application path specified" and takes down the task.
+            Command:
+              - /run.sh
             DependsOn:
               - ContainerName: connect
                 Condition: START
