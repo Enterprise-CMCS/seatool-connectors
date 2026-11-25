@@ -58,6 +58,7 @@ custom:
   dbInfo: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/dbInfo, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/dbInfo}
   connectImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/cp-kafka-connect:6.0.9"}
   connectUiImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}/connectui, "landoop/kafka-connect-ui"}
+  crowdstrike: ${ssm:/aws/reference/secretsmanager/crowdstrike/falcon}
   scripts:
     hooks:
       deploy:finalize: |
@@ -319,6 +320,23 @@ resources:
               - containerPort: 8083
                 hostPort: 8083
             User: "root"
+            EntryPoint:
+              - /tmp/CrowdStrike/rootfs/lib64/ld-linux-x86-64.so.2
+              - "--library-path"
+              - /tmp/CrowdStrike/rootfs/lib64
+              - /tmp/CrowdStrike/rootfs/bin/bash
+              - /tmp/CrowdStrike/rootfs/entrypoint-ecs.sh
+            DependsOn:
+              - ContainerName: crowdstrike-falcon-init-container
+                Condition: COMPLETE
+            LinuxParameters:
+              Capabilities:
+                Add:
+                  - SYS_PTRACE
+            MountPoints:
+              - ContainerPath: /tmp/CrowdStrike
+                ReadOnly: true
+                SourceVolume: crowdstrike-falcon-volume
             Command:
               - bash
               - "-c"
@@ -372,6 +390,8 @@ resources:
                   ${self:custom.brokerString}
               - Name: CONNECT_CONSUMER_SECURITY_PROTOCOL
                 Value: SSL
+              - Name: FALCONCTL_OPTS
+                Value: "--provisioning-token=${self:custom.crowdstrike.provisioningToken} --tags=${self:service},${sls:stage},${self:service}-${sls:stage}-connect --cid=${self:custom.crowdstrike.cid}"
             LogConfiguration:
               LogDriver: awslogs
               Options:
@@ -382,24 +402,66 @@ resources:
           - Name: mssql-tools
             Image: "mcr.microsoft.com/mssql-tools"
             Memory: ${param:maxContainerMemory}
+            EntryPoint:
+              - /tmp/CrowdStrike/rootfs/lib64/ld-linux-x86-64.so.2
+              - "--library-path"
+              - /tmp/CrowdStrike/rootfs/lib64
+              - /tmp/CrowdStrike/rootfs/bin/bash
+              - /tmp/CrowdStrike/rootfs/entrypoint-ecs.sh
+            DependsOn:
+              - ContainerName: crowdstrike-falcon-init-container
+                Condition: COMPLETE
+            LinuxParameters:
+              Capabilities:
+                Add:
+                  - SYS_PTRACE
+            MountPoints:
+              - ContainerPath: /tmp/CrowdStrike
+                ReadOnly: true
+                SourceVolume: crowdstrike-falcon-volume
             Command:
               - bash
               - "-c"
               - |
                 sleep infinity
+            Environment:
+              - Name: FALCONCTL_OPTS
+                Value: "--provisioning-token=${self:custom.crowdstrike.provisioningToken} --tags=${self:service},${sls:stage},${self:service}-${sls:stage}-connect --cid=${self:custom.crowdstrike.cid}"
           - Name: connect-ui
             Image: ${self:custom.connectUiImage}
             Memory: ${param:maxContainerMemory}
             Cpu: ${param:maxContainerCpu}
+            EntryPoint:
+              - /tmp/CrowdStrike/rootfs/lib64/ld-linux-x86-64.so.2
+              - "--library-path"
+              - /tmp/CrowdStrike/rootfs/lib64
+              - /tmp/CrowdStrike/rootfs/bin/bash
+              - /tmp/CrowdStrike/rootfs/entrypoint-ecs.sh
+            # Falcon wraps the image ENTRYPOINT; without Command the sensor exits
+            # with "no application path specified" and takes down the task.
+            Command:
+              - /run.sh
             DependsOn:
               - ContainerName: connect
                 Condition: START
+              - ContainerName: crowdstrike-falcon-init-container
+                Condition: COMPLETE
+            LinuxParameters:
+              Capabilities:
+                Add:
+                  - SYS_PTRACE
+            MountPoints:
+              - ContainerPath: /tmp/CrowdStrike
+                ReadOnly: true
+                SourceVolume: crowdstrike-falcon-volume
             portMappings:
               - containerPort: 8000
                 hostPort: 8000
             Environment:
               - Name: CONNECT_URL
                 Value: http://localhost:8083
+              - Name: FALCONCTL_OPTS
+                Value: "--provisioning-token=${self:custom.crowdstrike.provisioningToken} --tags=${self:service},${sls:stage},${self:service}-${sls:stage}-connect --cid=${self:custom.crowdstrike.cid}"
             LogConfiguration:
               LogDriver: awslogs
               Options:
@@ -407,7 +469,21 @@ resources:
                 awslogs-group: !Ref KafkaConnectUiWorkerLogGroup
                 awslogs-stream-prefix: fargate
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
-
+          - Name: crowdstrike-falcon-init-container
+            Image: ${self:custom.crowdstrike.image}
+            Essential: false
+            User: "0:0"
+            ReadonlyRootFilesystem: true
+            EntryPoint:
+              - /bin/bash
+              - "-c"
+              - "chmod u+rwx /tmp/CrowdStrike && mkdir -p /tmp/CrowdStrike/rootfs/lib  && cp -r /bin /etc /lib64 /usr /entrypoint-ecs.sh /tmp/CrowdStrike/rootfs && chmod -R a=rX /tmp/CrowdStrike"
+            MountPoints:
+              - ContainerPath: /tmp/CrowdStrike
+                ReadOnly: false
+                SourceVolume: crowdstrike-falcon-volume
+        Volumes:
+          - Name: crowdstrike-falcon-volume
         Family: ${self:service}-${sls:stage}-kafka-connect-worker
         NetworkMode: awsvpc
         ExecutionRoleArn: !GetAtt KafkaConnectWorkerRole.Arn

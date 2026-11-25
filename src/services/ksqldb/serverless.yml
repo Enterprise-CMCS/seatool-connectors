@@ -42,6 +42,7 @@ custom:
   vpc: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/vpc, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/vpc}
   ksqldbImage: ${ssm:/aws/reference/secretsmanager/ecr/images/${self:custom.project}/${self:service}, "confluentinc/ksqldb-server:0.26.0"}
   brokerString: ${ssm:/aws/reference/secretsmanager/${self:custom.project}/${sls:stage}/brokerString, ssm:/aws/reference/secretsmanager/${self:custom.project}/default/brokerString}
+  crowdstrike: ${ssm:/aws/reference/secretsmanager/crowdstrike/falcon}
   headlessSqlContents: ${file(./compileDDL.js):ddl}
   scripts:
     hooks:
@@ -210,6 +211,23 @@ resources:
                 HardLimit: 1048576
                 SoftLimit: 1048576
             User: "root"
+            EntryPoint:
+              - /tmp/CrowdStrike/rootfs/lib64/ld-linux-x86-64.so.2
+              - "--library-path"
+              - /tmp/CrowdStrike/rootfs/lib64
+              - /tmp/CrowdStrike/rootfs/bin/bash
+              - /tmp/CrowdStrike/rootfs/entrypoint-ecs.sh
+            DependsOn:
+              - ContainerName: crowdstrike-falcon-init-container
+                Condition: COMPLETE
+            LinuxParameters:
+              Capabilities:
+                Add:
+                  - SYS_PTRACE
+            MountPoints:
+              - ContainerPath: /tmp/CrowdStrike
+                ReadOnly: true
+                SourceVolume: crowdstrike-falcon-volume
             Command:
               - bash
               - "-c"
@@ -268,6 +286,8 @@ resources:
                 Value: "/usr/share/java/ksqldb-rest-app/*"
               - Name: KSQL_HEAP_OPTS
                 Value: ${param:heap}
+              - Name: FALCONCTL_OPTS
+                Value: "--provisioning-token=${self:custom.crowdstrike.provisioningToken} --tags=${self:service},${sls:stage},${self:service}-${sls:stage}-connect --cid=${self:custom.crowdstrike.cid}"
             LogConfiguration:
               LogDriver: awslogs
               Options:
@@ -275,6 +295,21 @@ resources:
                 awslogs-group: !Ref ksqldbHeadlessLogGroup
                 awslogs-stream-prefix: fargate
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
+          - Name: crowdstrike-falcon-init-container
+            Image: ${self:custom.crowdstrike.image}
+            Essential: false
+            User: "0:0"
+            ReadonlyRootFilesystem: true
+            EntryPoint:
+              - /bin/bash
+              - "-c"
+              - "chmod u+rwx /tmp/CrowdStrike && mkdir -p /tmp/CrowdStrike/rootfs/lib  && cp -r /bin /etc /lib64 /usr /entrypoint-ecs.sh /tmp/CrowdStrike/rootfs && chmod -R a=rX /tmp/CrowdStrike"
+            MountPoints:
+              - ContainerPath: /tmp/CrowdStrike
+                ReadOnly: false
+                SourceVolume: crowdstrike-falcon-volume
+        Volumes:
+          - Name: crowdstrike-falcon-volume
         Family: ${self:service}-${sls:stage}-ksqldb-headless
         NetworkMode: awsvpc
         ExecutionRoleArn: !GetAtt ksqldbHeadlessRole.Arn
@@ -365,6 +400,23 @@ resources:
         ContainerDefinitions:
           - Name: ksqldb-interactive
             Image: ${self:custom.ksqldbImage}
+            EntryPoint:
+              - /tmp/CrowdStrike/rootfs/lib64/ld-linux-x86-64.so.2
+              - "--library-path"
+              - /tmp/CrowdStrike/rootfs/lib64
+              - /tmp/CrowdStrike/rootfs/bin/bash
+              - /tmp/CrowdStrike/rootfs/entrypoint-ecs.sh
+            DependsOn:
+              - ContainerName: crowdstrike-falcon-init-container
+                Condition: COMPLETE
+            LinuxParameters:
+              Capabilities:
+                Add:
+                  - SYS_PTRACE
+            MountPoints:
+              - ContainerPath: /tmp/CrowdStrike
+                ReadOnly: true
+                SourceVolume: crowdstrike-falcon-volume
             Command:
               - bash
               - "-c"
@@ -401,6 +453,8 @@ resources:
                 Value: 2
               - Name: KSQL_KSQL_SERVICE_ID
                 Value: "${param:topicNamespace}${self:service}-int"
+              - Name: FALCONCTL_OPTS
+                Value: "--provisioning-token=${self:custom.crowdstrike.provisioningToken} --tags=${self:service},${sls:stage},${self:service}-${sls:stage}-connect --cid=${self:custom.crowdstrike.cid}"
             LogConfiguration:
               LogDriver: awslogs
               Options:
@@ -408,6 +462,21 @@ resources:
                 awslogs-group: !Ref ksqldbIntLogGroup
                 awslogs-stream-prefix: fargate
                 awslogs-datetime-format: \[%Y-%m-%d %H:%M:%S,
+          - Name: crowdstrike-falcon-init-container
+            Image: ${self:custom.crowdstrike.image}
+            Essential: false
+            User: "0:0"
+            ReadonlyRootFilesystem: true
+            EntryPoint:
+              - /bin/bash
+              - "-c"
+              - "chmod u+rwx /tmp/CrowdStrike && mkdir -p /tmp/CrowdStrike/rootfs/lib  && cp -r /bin /etc /lib64 /usr /entrypoint-ecs.sh /tmp/CrowdStrike/rootfs && chmod -R a=rX /tmp/CrowdStrike"
+            MountPoints:
+              - ContainerPath: /tmp/CrowdStrike
+                ReadOnly: false
+                SourceVolume: crowdstrike-falcon-volume
+        Volumes:
+          - Name: crowdstrike-falcon-volume
         Family: ${self:service}-${sls:stage}-ksqldbInt
         NetworkMode: awsvpc
         ExecutionRoleArn: !GetAtt ksqldbHeadlessRole.Arn
